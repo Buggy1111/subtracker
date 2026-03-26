@@ -1,0 +1,23 @@
+{
+  "name": "subtracker",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "type-check": "turbo type-check",
+    "db:generate": "npm run db:generate -w @subtracker/db",
+    "db:migrate": "npm run db:migrate -w @subtracker/db",
+    "db:studio": "npm run db:studio -w @subtracker/db"
+  },
+  "devDependencies": {
+    "turbo": "^2"
+  },
+  "packageManager": "npm@10.9.2"
+}
