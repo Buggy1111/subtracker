@@ -313,6 +313,24 @@
 }
 
 /* ============================
+   PREMIUM BACKGROUND
+   ============================ */
+
+@keyframes aurora-breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* Section glow accents — placed behind individual sections */
+.section-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: 0;
+}
+
+/* ============================
    LANDING NAV
    ============================ */
 

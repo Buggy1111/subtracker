@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AnimatedDashboard } from "@/components/animated-dashboard";
 import { LandingNav } from "@/components/landing-nav";
+import { AuroraBg } from "@/components/aurora-bg";
+import { ScrollReveal, AnimatedStat } from "@/components/scroll-reveal";
 import {
   Upload,
   Bell,
@@ -40,28 +42,8 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen bg-[#07070A] text-zinc-100 selection:bg-indigo-500/30 selection:text-white">
 
-      {/* ━━━ ATMOSPHERE ━━━ */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        {/* Dot grid */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-          maskImage: "radial-gradient(ellipse 70% 50% at 50% 30%, black, transparent)",
-          WebkitMaskImage: "radial-gradient(ellipse 70% 50% at 50% 30%, black, transparent)",
-        }} />
-        {/* Primary nebula */}
-        <div className="absolute -top-[200px] left-1/2 -translate-x-1/2 w-[900px] h-[700px] animate-[drift_20s_ease-in-out_infinite]"
-          style={{ background: "radial-gradient(ellipse at center, rgba(99,102,241,0.1) 0%, rgba(124,58,237,0.04) 40%, transparent 70%)", filter: "blur(80px)" }}
-        />
-        {/* Secondary warm accent */}
-        <div className="absolute top-[40%] -right-[200px] w-[500px] h-[500px] animate-[drift-reverse_25s_ease-in-out_infinite]"
-          style={{ background: "radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 60%)", filter: "blur(100px)" }}
-        />
-        {/* Bottom cool accent */}
-        <div className="absolute bottom-[10%] -left-[200px] w-[600px] h-[400px] animate-[breathe_8s_ease-in-out_infinite]"
-          style={{ background: "radial-gradient(circle, rgba(34,197,94,0.05) 0%, transparent 60%)", filter: "blur(100px)" }}
-        />
-      </div>
+      {/* ━━━ LIVING BACKGROUND ━━━ */}
+      <AuroraBg />
 
       {/* ━━━ NAV ━━━ */}
       <LandingNav />
@@ -107,135 +89,184 @@ export default function LandingPage() {
 
       {/* ━━━ SERVICE LOGOS + PRICES (animated) ━━━ */}
       <section className="relative z-10 mx-auto max-w-[1000px] px-6 pt-12 pb-28">
-        <p className="text-center text-[11px] font-bold tracking-[0.12em] uppercase text-zinc-600 mb-8">
-          Track every subscription in one place
-        </p>
-        <div className="anim-scale">
+        <ScrollReveal variant="fade-up">
+          <p className="text-center text-[11px] font-bold tracking-[0.12em] uppercase text-zinc-600 mb-8">
+            Track every subscription in one place
+          </p>
+        </ScrollReveal>
+        <ScrollReveal variant="fade-scale" delay={100}>
           <AnimatedDashboard />
-        </div>
+        </ScrollReveal>
       </section>
 
+      {/* ━━━ Gradient divider ━━━ */}
+      <div className="relative z-10 h-px mx-auto max-w-[600px]">
+        <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
+      </div>
+
       {/* ━━━ LOGO TICKER ━━━ */}
-      <section className="relative z-10 py-10 overflow-hidden border-y border-white/[0.03]">
-        <p className="text-center text-[10px] font-bold tracking-[0.15em] uppercase text-zinc-700 mb-7">
-          Tracks 35+ popular services out of the box
-        </p>
-        <div className="flex animate-[scroll-logos_30s_linear_infinite]" style={{ width: "max-content" }}>
-          {[...logos, ...logos].map((s, i) => (
-            <div key={i} className="flex items-center gap-2.5 mx-8 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-300">
-              <div className="w-7 h-7 rounded-[8px] flex items-center justify-center text-[11px] font-bold"
-                style={{ backgroundColor: s.c + "12", color: s.c }}>
-                {s.n.charAt(0)}
-              </div>
-              <span className="text-[13px] font-medium text-zinc-500">{s.n}</span>
+      <ScrollReveal variant="fade-up">
+        <section className="relative z-10 py-12 overflow-hidden">
+          <p className="text-center text-[10px] font-bold tracking-[0.15em] uppercase text-zinc-700 mb-7">
+            Tracks 35+ popular services out of the box
+          </p>
+          <div className="relative">
+            {/* Left/right fade masks */}
+            <div className="absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-[#07070A] to-transparent" />
+            <div className="absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-[#07070A] to-transparent" />
+            <div className="flex animate-[scroll-logos_30s_linear_infinite]" style={{ width: "max-content" }}>
+              {[...logos, ...logos].map((s, i) => (
+                <div key={i} className="flex items-center gap-2.5 mx-8 flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-7 h-7 rounded-[8px] flex items-center justify-center text-[11px] font-bold"
+                    style={{ backgroundColor: s.c + "15", color: s.c }}>
+                    {s.n.charAt(0)}
+                  </div>
+                  <span className="text-[13px] font-medium text-zinc-600">{s.n}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      {/* ━━━ Gradient divider ━━━ */}
+      <div className="relative z-10 h-px mx-auto max-w-[600px]">
+        <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/15 to-transparent" />
+      </div>
 
       {/* ━━━ STATS ━━━ */}
       <section className="relative z-10 mx-auto max-w-[900px] px-6 py-28">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Section-specific glow */}
+        <div className="section-glow w-[500px] h-[300px] -top-[50px] left-1/2 -translate-x-1/2" style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.06), transparent 70%)" }} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { num: "$219", label: "avg. monthly spend", desc: "on subscriptions per person" },
             { num: "2.5×", label: "the underestimate", desc: "of what people think they pay" },
             { num: "$127", label: "wasted every year", desc: "on forgotten subscriptions" },
           ].map((stat, i) => (
-            <div key={stat.num} className="text-center md:text-left group">
-              <p className="font-display text-[48px] md:text-[56px] font-bold tracking-[-0.04em] leading-none bg-gradient-to-br from-zinc-100 via-zinc-300 to-zinc-600 bg-clip-text text-transparent group-hover:from-indigo-300 group-hover:via-violet-300 group-hover:to-fuchsia-400 transition-all duration-500">
-                {stat.num}
-              </p>
-              <p className="mt-3 text-[14px] font-semibold text-zinc-300">{stat.label}</p>
-              <p className="text-[13px] text-zinc-600">{stat.desc}</p>
-              {i < 2 && <div className="hidden md:block mt-8 h-px bg-gradient-to-r from-white/[0.06] to-transparent" />}
-            </div>
+            <ScrollReveal key={stat.num} variant="fade-up" delay={i * 120}>
+              <div className="text-center md:text-left group">
+                <AnimatedStat
+                  value={stat.num}
+                  className="font-display text-[48px] md:text-[56px] font-bold tracking-[-0.04em] leading-none bg-gradient-to-br from-zinc-100 via-zinc-300 to-zinc-600 bg-clip-text text-transparent group-hover:from-indigo-300 group-hover:via-violet-300 group-hover:to-fuchsia-400 transition-all duration-500 inline-block"
+                />
+                <p className="mt-3 text-[14px] font-semibold text-zinc-300">{stat.label}</p>
+                <p className="text-[13px] text-zinc-600">{stat.desc}</p>
+                {i < 2 && <div className="hidden md:block mt-8 h-px bg-gradient-to-r from-white/[0.06] to-transparent" />}
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
+
+      {/* ━━━ Gradient divider ━━━ */}
+      <div className="relative z-10 h-px mx-auto max-w-[600px]">
+        <div className="h-px bg-gradient-to-r from-transparent via-emerald-500/15 to-transparent" />
+      </div>
 
       {/* ━━━ FEATURES ━━━ */}
       <section id="features" className="relative z-10 mx-auto max-w-[1100px] px-6 py-24">
-        <div className="text-center mb-20">
-          <h2 className="font-display text-[clamp(2rem,4.5vw,3.2rem)] font-bold tracking-[-0.035em] leading-[1.1]">
-            Built for people who
-            <br />
-            <span className="text-zinc-600">hate wasting money.</span>
-          </h2>
-        </div>
+        {/* Section glow */}
+        <div className="section-glow w-[600px] h-[400px] top-[100px] right-[-200px]" style={{ background: "radial-gradient(ellipse, rgba(139,92,246,0.05), transparent 70%)" }} />
+
+        <ScrollReveal variant="fade-up">
+          <div className="text-center mb-20">
+            <h2 className="font-display text-[clamp(2rem,4.5vw,3.2rem)] font-bold tracking-[-0.035em] leading-[1.1]">
+              Built for people who
+              <br />
+              <span className="text-zinc-600">hate wasting money.</span>
+            </h2>
+          </div>
+        </ScrollReveal>
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
-            <div key={f.title} className="group refract-card p-7">
-              <div className="icon-glow mb-6 flex h-12 w-12 items-center justify-center rounded-[14px] transition-transform duration-300 group-hover:scale-105"
-                style={{ backgroundColor: f.accent + "10", color: f.accent }}>
-                <f.icon className="h-[22px] w-[22px]" strokeWidth={1.8} />
+          {features.map((f, i) => (
+            <ScrollReveal key={f.title} variant="fade-up" delay={i * 80}>
+              <div className="group refract-card p-7 h-full">
+                <div className="icon-glow mb-6 flex h-12 w-12 items-center justify-center rounded-[14px] transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]"
+                  style={{ backgroundColor: f.accent + "10", color: f.accent }}>
+                  <f.icon className="h-[22px] w-[22px]" strokeWidth={1.8} />
+                </div>
+                <h3 className="font-display text-[16px] font-semibold tracking-[-0.01em] text-zinc-100">
+                  {f.title}
+                </h3>
+                <p className="mt-2.5 text-[13.5px] leading-[1.65] text-zinc-500 group-hover:text-zinc-400 transition-colors duration-300">
+                  {f.desc}
+                </p>
               </div>
-              <h3 className="font-display text-[16px] font-semibold tracking-[-0.01em] text-zinc-100">
-                {f.title}
-              </h3>
-              <p className="mt-2.5 text-[13.5px] leading-[1.65] text-zinc-500 group-hover:text-zinc-400 transition-colors duration-300">
-                {f.desc}
-              </p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
+      {/* ━━━ Gradient divider ━━━ */}
+      <div className="relative z-10 h-px mx-auto max-w-[600px]">
+        <div className="h-px bg-gradient-to-r from-transparent via-fuchsia-500/15 to-transparent" />
+      </div>
+
       {/* ━━━ PRICING / CTA ━━━ */}
       <section id="pricing" className="relative z-10 mx-auto max-w-[680px] px-6 py-28">
-        <div className="gradient-border-animated">
-          <div className="relative bg-[#0C0C10] rounded-[20px] p-10 md:p-14 text-center noise">
-            {/* Top refraction */}
-            <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-indigo-400/20 to-transparent" />
+        {/* Section glow */}
+        <div className="section-glow w-[400px] h-[400px] top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ background: "radial-gradient(circle, rgba(34,197,94,0.04), transparent 60%)" }} />
 
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/[0.06] border border-emerald-500/15 px-4 py-1.5 text-[12px] font-semibold tracking-wide text-emerald-400 mb-8">
-              <Check className="h-3.5 w-3.5" />
-              Free forever — no credit card
-            </div>
+        <ScrollReveal variant="blur-in">
+          <div className="gradient-border-animated">
+            <div className="relative bg-[#0C0C10] rounded-[20px] p-10 md:p-14 text-center noise">
+              {/* Top refraction */}
+              <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-indigo-400/20 to-transparent" />
 
-            <h2 className="font-display text-[clamp(1.8rem,4vw,2.6rem)] font-bold tracking-[-0.035em] leading-[1.1]">
-              No subscription
-              <br />
-              <span className="text-zinc-600">to track subscriptions.</span>
-            </h2>
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/[0.06] border border-emerald-500/15 px-4 py-1.5 text-[12px] font-semibold tracking-wide text-emerald-400 mb-8">
+                <Check className="h-3.5 w-3.5" />
+                Free forever — no credit card
+              </div>
 
-            <div className="mt-10 grid gap-2.5 max-w-[300px] mx-auto text-left">
-              {[
-                "Unlimited subs (self-hosted)",
-                "Beautiful dark dashboard",
-                "Bank CSV auto-detection",
-                "Renewal reminders",
-                "Multi-currency support",
-                "Docker self-hosting",
-              ].map((item) => (
-                <div key={item} className="flex items-center gap-3">
-                  <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-500/10 flex-shrink-0">
-                    <Check className="h-2.5 w-2.5 text-emerald-400" strokeWidth={3} />
-                  </div>
-                  <span className="text-[13px] text-zinc-400">{item}</span>
-                </div>
-              ))}
-            </div>
+              <h2 className="font-display text-[clamp(1.8rem,4vw,2.6rem)] font-bold tracking-[-0.035em] leading-[1.1]">
+                No subscription
+                <br />
+                <span className="text-zinc-600">to track subscriptions.</span>
+              </h2>
 
-            <div className="mt-10">
-              <Button render={<Link href="/login" />} nativeButton={false}
-                className="h-[48px] px-8 bg-indigo-500 text-white text-[15px] font-semibold rounded-[14px]
-                  shadow-[0_1px_2px_rgba(0,0,0,0.4),0_0_0_1px_rgba(99,102,241,0.5),0_8px_32px_rgba(99,102,241,0.25)]
-                  hover:bg-indigo-400
-                  hover:shadow-[0_1px_2px_rgba(0,0,0,0.4),0_0_0_1px_rgba(99,102,241,0.6),0_12px_48px_rgba(99,102,241,0.35)]
-                  hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200">
-                Get started free
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
+              <div className="mt-10 grid gap-2.5 max-w-[300px] mx-auto text-left">
+                {[
+                  "Unlimited subs (self-hosted)",
+                  "Beautiful dark dashboard",
+                  "Bank CSV auto-detection",
+                  "Renewal reminders",
+                  "Multi-currency support",
+                  "Docker self-hosting",
+                ].map((item, i) => (
+                  <ScrollReveal key={item} variant="fade-left" delay={i * 60} once>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-emerald-500/10 flex-shrink-0">
+                        <Check className="h-2.5 w-2.5 text-emerald-400" strokeWidth={3} />
+                      </div>
+                      <span className="text-[13px] text-zinc-400">{item}</span>
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
 
-            <div className="mt-10 flex items-center justify-center gap-2 rounded-[12px] border border-white/[0.04] bg-white/[0.02] px-5 py-3 max-w-max mx-auto">
-              <Terminal className="h-3.5 w-3.5 text-zinc-600" />
-              <code className="text-[13px] font-mono-feature text-zinc-400">
-                <span className="text-zinc-700">$</span> docker compose up -d
-              </code>
+              <div className="mt-10">
+                <Button render={<Link href="/login" />} nativeButton={false}
+                  className="h-[48px] px-8 bg-indigo-500 text-white text-[15px] font-semibold rounded-[14px]
+                    shadow-[0_1px_2px_rgba(0,0,0,0.4),0_0_0_1px_rgba(99,102,241,0.5),0_8px_32px_rgba(99,102,241,0.25)]
+                    hover:bg-indigo-400
+                    hover:shadow-[0_1px_2px_rgba(0,0,0,0.4),0_0_0_1px_rgba(99,102,241,0.6),0_12px_48px_rgba(99,102,241,0.35)]
+                    hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200">
+                  Get started free
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="mt-10 flex items-center justify-center gap-2 rounded-[12px] border border-white/[0.04] bg-white/[0.02] px-5 py-3 max-w-max mx-auto">
+                <Terminal className="h-3.5 w-3.5 text-zinc-600" />
+                <code className="text-[13px] font-mono-feature text-zinc-400">
+                  <span className="text-zinc-700">$</span> docker compose up -d
+                </code>
+              </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* ━━━ FOOTER ━━━ */}
