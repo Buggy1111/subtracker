@@ -105,22 +105,22 @@ export function LandingNav() {
           </Link>
 
           {/* Center nav links */}
-          <div className="hidden sm:flex relative z-10 items-center gap-0.5 rounded-[12px] bg-white/[0.035] p-[3px] border border-white/[0.03]">
+          <div className="hidden sm:flex relative z-10 items-center gap-0.5 rounded-[12px] bg-white/[0.05] p-[3px] border border-white/[0.06]">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="nav-link-item relative px-4 py-[5px] rounded-[9px] text-[12.5px] font-medium text-zinc-500 hover:text-zinc-100 transition-all duration-250"
+                className="nav-link-item relative px-4 py-[5px] rounded-[9px] text-[13px] font-medium text-zinc-300 hover:text-white transition-all duration-250"
               >
                 <span className="relative z-10">{link.label}</span>
               </a>
             ))}
-            <div className="h-3 w-px bg-white/[0.06] mx-0.5" />
+            <div className="h-3 w-px bg-white/[0.1] mx-0.5" />
             <a
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="nav-link-item relative flex items-center gap-1.5 px-3.5 py-[5px] rounded-[9px] text-[12.5px] font-medium text-zinc-500 hover:text-zinc-100 transition-all duration-250"
+              className="nav-link-item relative flex items-center gap-1.5 px-3.5 py-[5px] rounded-[9px] text-[13px] font-medium text-zinc-300 hover:text-white transition-all duration-250"
             >
               <Github className="h-3.5 w-3.5" />
               <span className="relative z-10">GitHub</span>
