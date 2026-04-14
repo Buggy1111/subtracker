@@ -258,11 +258,14 @@ export default function LandingPage() {
                 </Button>
               </div>
 
-              <div className="mt-10 flex items-center justify-center gap-2 rounded-[12px] border border-white/[0.04] bg-white/[0.02] px-5 py-3 max-w-max mx-auto">
-                <Terminal className="h-3.5 w-3.5 text-zinc-600" />
-                <code className="text-[13px] font-mono-feature text-zinc-400">
-                  <span className="text-zinc-700">$</span> docker compose up -d
-                </code>
+              <div className="mt-10 flex flex-col items-center gap-1.5">
+                <p className="text-[11px] font-medium tracking-wide text-zinc-600">Or self-host with one command:</p>
+                <div className="flex items-center justify-center gap-2 rounded-[12px] border border-white/[0.04] bg-white/[0.02] px-5 py-3 max-w-max">
+                  <Terminal className="h-3.5 w-3.5 text-zinc-600" />
+                  <code className="text-[13px] font-mono-feature text-zinc-400">
+                    <span className="text-zinc-700">$</span> docker compose up -d
+                  </code>
+                </div>
               </div>
             </div>
           </div>
