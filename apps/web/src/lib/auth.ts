@@ -51,9 +51,11 @@ function createAdapter() {
 const hasAdapter = !isDev && !!process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("dummy");
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET,
   adapter: createAdapter(),
   session: { strategy: hasAdapter ? ("database" as const) : ("jwt" as const) },
   providers: isDev ? devProviders : prodProviders,
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
