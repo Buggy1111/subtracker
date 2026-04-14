@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Upload } from "lucide-react";
 import Link from "next/link";
+import { getSubscriptions } from "@/app/actions/subscriptions";
+import { SubscriptionList } from "./subscription-list";
 
-export default function SubscriptionsPage() {
-  // TODO: Fetch subscriptions from DB
+export default async function SubscriptionsPage() {
+  const result = await getSubscriptions();
+  const subscriptions = result.data ?? [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -26,29 +30,32 @@ export default function SubscriptionsPage() {
         </div>
       </div>
 
-      {/* Empty state */}
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
-            <CreditCardIcon className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-semibold">No subscriptions yet</h3>
-          <p className="text-muted-foreground mt-1 max-w-sm">
-            Add your first subscription to see where your money goes every
-            month.
-          </p>
-          <div className="flex gap-3 mt-6">
-            <Button variant="outline" render={<Link href="/import" />}>
-              <Upload className="mr-2 h-4 w-4" />
-              Import from Bank CSV
-            </Button>
-            <Button render={<Link href="/subscriptions/new" />}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Manually
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {subscriptions.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+              <CreditCardIcon className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold">No subscriptions yet</h3>
+            <p className="text-muted-foreground mt-1 max-w-sm">
+              Add your first subscription to see where your money goes every
+              month.
+            </p>
+            <div className="flex gap-3 mt-6">
+              <Button variant="outline" render={<Link href="/import" />}>
+                <Upload className="mr-2 h-4 w-4" />
+                Import from Bank CSV
+              </Button>
+              <Button render={<Link href="/subscriptions/new" />}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Manually
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <SubscriptionList subscriptions={subscriptions} />
+      )}
     </div>
   );
 }

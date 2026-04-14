@@ -106,22 +106,22 @@ export default function LandingPage() {
 
       {/* ━━━ LOGO TICKER ━━━ */}
       <ScrollReveal variant="fade-up">
-        <section className="relative z-10 py-12 overflow-hidden">
-          <p className="text-center text-[10px] font-bold tracking-[0.15em] uppercase text-zinc-700 mb-7">
+        <section className="relative z-10 py-16 overflow-hidden">
+          <p className="text-center text-[11px] font-bold tracking-[0.15em] uppercase text-zinc-500 mb-8">
             Tracks 35+ popular services out of the box
           </p>
           <div className="relative">
             {/* Left/right fade masks */}
-            <div className="absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-[#07070A] to-transparent" />
-            <div className="absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-[#07070A] to-transparent" />
+            <div className="absolute left-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-r from-[#07070A] to-transparent" />
+            <div className="absolute right-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-l from-[#07070A] to-transparent" />
             <div className="flex animate-[scroll-logos_30s_linear_infinite]" style={{ width: "max-content" }}>
               {[...logos, ...logos].map((s, i) => (
-                <div key={i} className="flex items-center gap-2.5 mx-8 flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-7 h-7 rounded-[8px] flex items-center justify-center text-[11px] font-bold"
-                    style={{ backgroundColor: s.c + "15", color: s.c }}>
+                <div key={i} className="flex items-center gap-3 mx-7 flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-8 h-8 rounded-[8px] flex items-center justify-center text-[12px] font-bold"
+                    style={{ backgroundColor: s.c + "25", color: s.c }}>
                     {s.n.charAt(0)}
                   </div>
-                  <span className="text-[13px] font-medium text-zinc-600">{s.n}</span>
+                  <span className="text-[13px] font-medium text-zinc-400">{s.n}</span>
                 </div>
               ))}
             </div>

@@ -1,34 +1,46 @@
 import { CreditCard, TrendingUp, Bell, DollarSign } from "lucide-react";
+import { getDashboardData } from "@/app/actions/dashboard";
+import Link from "next/link";
 
-const kpiCards = [
-  {
-    title: "Monthly Spend",
-    value: "$0.00",
-    subtitle: "Add subscriptions to start",
-    icon: DollarSign,
-    gradient: true,
-  },
-  {
-    title: "Active Subscriptions",
-    value: "0",
-    subtitle: "No active subscriptions",
-    icon: CreditCard,
-  },
-  {
-    title: "Next Renewal",
-    value: "\u2014",
-    subtitle: "No upcoming renewals",
-    icon: Bell,
-  },
-  {
-    title: "Annual Projection",
-    value: "$0.00",
-    subtitle: "Estimated yearly total",
-    icon: TrendingUp,
-  },
-];
+export default async function DashboardPage() {
+  const data = await getDashboardData();
 
-export default function DashboardPage() {
+  const monthlySpend = data?.monthlySpend ?? 0;
+  const annualProjection = data?.annualProjection ?? 0;
+  const activeCount = data?.activeCount ?? 0;
+  const nextRenewal = data?.nextRenewal;
+  const upcomingRenewals = data?.upcomingRenewals ?? [];
+
+  const kpiCards = [
+    {
+      title: "Monthly Spend",
+      value: `$${monthlySpend.toFixed(2)}`,
+      subtitle: activeCount > 0 ? `${activeCount} active subscriptions` : "Add subscriptions to start",
+      icon: DollarSign,
+      gradient: true,
+    },
+    {
+      title: "Active Subscriptions",
+      value: String(activeCount),
+      subtitle: activeCount > 0 ? `${data?.totalCount ?? 0} total` : "No active subscriptions",
+      icon: CreditCard,
+    },
+    {
+      title: "Next Renewal",
+      value: nextRenewal
+        ? new Date(nextRenewal.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : "\u2014",
+      subtitle: nextRenewal ? `${nextRenewal.name} · $${parseFloat(nextRenewal.amount).toFixed(2)}` : "No upcoming renewals",
+      icon: Bell,
+    },
+    {
+      title: "Annual Projection",
+      value: `$${annualProjection.toFixed(2)}`,
+      subtitle: "Estimated yearly total",
+      icon: TrendingUp,
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div>
@@ -71,7 +83,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Charts */}
+      {/* Charts placeholder + Category breakdown */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
           <h3 className="text-[15px] font-semibold tracking-tight mb-1">
@@ -79,7 +91,9 @@ export default function DashboardPage() {
           </h3>
           <p className="text-xs text-zinc-600 mb-6">Last 6 months</p>
           <div className="flex h-48 items-center justify-center text-sm text-zinc-600">
-            Add subscriptions to see spending trends
+            {activeCount > 0
+              ? "Chart coming soon"
+              : "Add subscriptions to see spending trends"}
           </div>
         </div>
 
@@ -88,9 +102,26 @@ export default function DashboardPage() {
             By Category
           </h3>
           <p className="text-xs text-zinc-600 mb-6">Spend distribution</p>
-          <div className="flex h-48 items-center justify-center text-sm text-zinc-600">
-            Add subscriptions to see category breakdown
-          </div>
+          {data && data.categoryBreakdown.length > 0 ? (
+            <div className="space-y-3">
+              {data.categoryBreakdown
+                .sort((a, b) => b.monthlyAmount - a.monthlyAmount)
+                .map((cat) => (
+                  <div key={cat.categoryId} className="flex items-center justify-between">
+                    <span className="text-sm text-zinc-400 truncate">
+                      {cat.categoryId === "uncategorized" ? "Uncategorized" : cat.categoryId}
+                    </span>
+                    <span className="font-mono text-sm text-zinc-200 tabular-nums">
+                      ${cat.monthlyAmount.toFixed(2)}/mo
+                    </span>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="flex h-48 items-center justify-center text-sm text-zinc-600">
+              Add subscriptions to see category breakdown
+            </div>
+          )}
         </div>
       </div>
 
@@ -100,9 +131,41 @@ export default function DashboardPage() {
           Upcoming Renewals
         </h3>
         <p className="text-xs text-zinc-600 mb-6">Next 7 days</p>
-        <div className="flex h-24 items-center justify-center text-sm text-zinc-600">
-          No upcoming renewals
-        </div>
+        {upcomingRenewals.length > 0 ? (
+          <div className="space-y-3">
+            {upcomingRenewals.map((sub) => (
+              <div
+                key={sub.id}
+                className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.02] px-4 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-8 w-8 rounded-md flex items-center justify-center text-white text-xs font-bold"
+                    style={{ backgroundColor: sub.color ?? "#6366F1" }}
+                  >
+                    {sub.name.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium text-zinc-200">{sub.name}</span>
+                </div>
+                <div className="text-right">
+                  <p className="font-mono text-sm font-semibold text-zinc-200 tabular-nums">
+                    ${parseFloat(sub.amount).toFixed(2)}
+                  </p>
+                  <p className="text-xs text-zinc-600">
+                    {new Date(sub.nextBillingDate + "T00:00:00").toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex h-24 items-center justify-center text-sm text-zinc-600">
+            No upcoming renewals
+          </div>
+        )}
       </div>
     </div>
   );

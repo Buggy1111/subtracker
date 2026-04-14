@@ -14,7 +14,8 @@
     "type-check": "turbo type-check",
     "db:generate": "npm run db:generate -w @subtracker/db",
     "db:migrate": "npm run db:migrate -w @subtracker/db",
-    "db:studio": "npm run db:studio -w @subtracker/db"
+    "db:studio": "npm run db:studio -w @subtracker/db",
+    "db:seed": "npm run db:seed -w @subtracker/db"
   },
   "devDependencies": {
     "turbo": "^2"

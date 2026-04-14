@@ -2,11 +2,11 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { createDb, schema } from "@subtracker/db/client";
 
 const isDev = process.env.NODE_ENV === "development";
 
-// In dev mode: use JWT sessions + Credentials (no DB needed)
-// In prod mode: use Drizzle adapter + OAuth providers
 const devProviders = [
   Credentials({
     name: "Dev Login",
@@ -35,13 +35,20 @@ const prodProviders = [
   }),
 ];
 
+function createAdapter() {
+  if (isDev) return undefined;
+  const db = createDb(process.env.DATABASE_URL!);
+  return DrizzleAdapter(db, {
+    usersTable: schema.users,
+    accountsTable: schema.accounts,
+    sessionsTable: schema.sessions,
+    verificationTokensTable: schema.verificationTokens,
+  });
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // Skip DB adapter in dev (Credentials provider requires JWT strategy)
-  ...(isDev
-    ? { session: { strategy: "jwt" as const } }
-    : {
-        adapter: undefined, // TODO: DrizzleAdapter when DB is ready
-      }),
+  adapter: createAdapter(),
+  session: { strategy: isDev ? ("jwt" as const) : ("database" as const) },
   providers: isDev ? devProviders : prodProviders,
   pages: {
     signIn: "/login",
@@ -53,9 +60,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token;
     },
-    session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
+    session({ session, token, user }) {
+      if (session.user) {
+        session.user.id = (token?.id as string) ?? user?.id;
       }
       return session;
     },
