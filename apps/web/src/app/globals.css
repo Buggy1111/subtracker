@@ -451,6 +451,60 @@
     0 0 32px rgba(99, 102, 241, 0.15) !important;
 }
 
+/* ============================
+   BENTO GRID
+   ============================ */
+
+.bento-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
+}
+
+.bento-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(99, 102, 241, 0.04);
+}
+
+.bento-icon {
+  display: flex;
+  height: 44px;
+  width: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.bento-card:hover .bento-icon {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+/* ============================
+   HERO PARALLAX
+   ============================ */
+
+.hero-parallax h1,
+.hero-parallax .anim-reveal {
+  will-change: transform;
+}
+
 /* Typography */
 .font-display {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
