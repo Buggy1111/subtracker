@@ -270,13 +270,13 @@ export default function LandingPage() {
       </section>
 
       {/* ━━━ FOOTER ━━━ */}
-      <footer className="relative z-10 border-t border-white/[0.04]">
-        <div className="mx-auto flex h-[56px] max-w-[1200px] items-center justify-between px-6">
-          <p className="text-[12px] font-medium text-zinc-700">
+      <footer className="relative z-10 border-t border-white/[0.08]">
+        <div className="mx-auto flex h-[64px] max-w-[1200px] items-center justify-between px-6">
+          <p className="text-[13px] font-medium text-zinc-500">
             SubTracker — open source subscription tracking
           </p>
           <div className="flex items-center gap-5">
-            <a href="https://github.com" className="text-[12px] font-medium text-zinc-700 hover:text-zinc-300 transition-colors">GitHub</a>
+            <a href="https://github.com" className="text-[13px] font-medium text-zinc-500 hover:text-zinc-200 transition-colors">GitHub</a>
           </div>
         </div>
       </footer>
