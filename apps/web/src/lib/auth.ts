@@ -36,8 +36,10 @@ const prodProviders = [
 ];
 
 function createAdapter() {
-  if (isDev) return undefined;
-  const db = createDb(process.env.DATABASE_URL!);
+  if (isDev || !process.env.DATABASE_URL || process.env.DATABASE_URL.includes("dummy")) {
+    return undefined;
+  }
+  const db = createDb(process.env.DATABASE_URL);
   return DrizzleAdapter(db, {
     usersTable: schema.users,
     accountsTable: schema.accounts,
@@ -46,9 +48,11 @@ function createAdapter() {
   });
 }
 
+const hasAdapter = !isDev && !!process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("dummy");
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: createAdapter(),
-  session: { strategy: isDev ? ("jwt" as const) : ("database" as const) },
+  session: { strategy: hasAdapter ? ("database" as const) : ("jwt" as const) },
   providers: isDev ? devProviders : prodProviders,
   pages: {
     signIn: "/login",
