@@ -5,8 +5,15 @@ services:
       - "3000:3000"
     environment:
       - DATABASE_URL=postgresql://subtracker:subtracker@db:5432/subtracker
-      - AUTH_SECRET=${AUTH_SECRET:-change-me-in-production}
-      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      # REQUIRED — generate with: openssl rand -base64 32
+      # App will fail fast if AUTH_SECRET is unset or empty
+      - AUTH_SECRET=${AUTH_SECRET:?AUTH_SECRET is required. Generate with: openssl rand -base64 32}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      # OAuth — at least one provider pair required for login
+      - AUTH_GOOGLE_ID=${AUTH_GOOGLE_ID:-}
+      - AUTH_GOOGLE_SECRET=${AUTH_GOOGLE_SECRET:-}
+      - AUTH_GITHUB_ID=${AUTH_GITHUB_ID:-}
+      - AUTH_GITHUB_SECRET=${AUTH_GITHUB_SECRET:-}
     depends_on:
       db:
         condition: service_healthy

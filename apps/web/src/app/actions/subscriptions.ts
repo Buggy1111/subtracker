@@ -40,6 +40,26 @@ export async function getSubscriptions(): Promise<ActionResult<typeof subscripti
   }
 }
 
+export async function getSubscription(
+  id: string,
+): Promise<ActionResult<typeof subscriptions.$inferSelect>> {
+  const userId = await getAuthUserId();
+  if (!userId) return { success: false, error: "Not authenticated" };
+
+  try {
+    const [data] = await db
+      .select()
+      .from(subscriptions)
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+      .limit(1);
+
+    if (!data) return { success: false, error: "Subscription not found" };
+    return { success: true, data };
+  } catch {
+    return { success: false, error: "Failed to load subscription" };
+  }
+}
+
 export async function getCategories(): Promise<ActionResult<typeof categories.$inferSelect[]>> {
   const userId = await getAuthUserId();
   if (!userId) return { success: false, error: "Not authenticated" };

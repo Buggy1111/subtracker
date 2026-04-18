@@ -6,3 +6,5 @@ dist/
 coverage/
 *.tsbuildinfo
 .turbo/
+.vercel
+vercel-env-*.txt

@@ -1,8 +1,6 @@
+import Link from "next/link";
 import { signIn } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-
-const isDev = process.env.NODE_ENV === "development";
 
 export default function LoginPage() {
   return (
@@ -11,11 +9,15 @@ export default function LoginPage() {
       <div className="pointer-events-none fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-indigo-500/[0.06] blur-[100px]" />
 
       <div className="relative z-10 w-full max-w-sm">
-        {/* Logo */}
+        {/* Logo — clickable, goes back to landing */}
         <div className="text-center mb-8">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500 text-white font-bold text-xl shadow-[0_0_40px_rgba(99,102,241,0.3)]">
+          <Link
+            href="/"
+            aria-label="Back to homepage"
+            className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500 text-white font-bold text-xl shadow-[0_0_40px_rgba(99,102,241,0.3)] transition-transform hover:scale-105"
+          >
             S
-          </div>
+          </Link>
           <h1 className="mt-5 text-2xl font-bold tracking-[-0.02em] text-zinc-50">
             Welcome to SubTracker
           </h1>
@@ -26,34 +28,6 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl p-6 space-y-3">
-          {isDev && (
-            <>
-              <form
-                action={async () => {
-                  "use server";
-                  await signIn("credentials", {
-                    email: "dev@subtracker.app",
-                    redirectTo: "/dashboard",
-                  });
-                }}
-              >
-                <Button
-                  className="w-full h-11 bg-indigo-500 text-white font-semibold rounded-xl shadow-[0_0_0_1px_rgba(99,102,241,0.5),0_2px_8px_rgba(99,102,241,0.25)] hover:bg-indigo-400 hover:shadow-[0_0_0_1px_rgba(99,102,241,0.6),0_4px_16px_rgba(99,102,241,0.4)] hover:-translate-y-px transition-all duration-200"
-                  type="submit"
-                >
-                  Dev Login
-                </Button>
-              </form>
-              <div className="flex items-center gap-3 py-1">
-                <Separator className="flex-1 bg-white/[0.06]" />
-                <span className="text-[11px] font-medium tracking-wide uppercase text-zinc-600">
-                  or
-                </span>
-                <Separator className="flex-1 bg-white/[0.06]" />
-              </div>
-            </>
-          )}
-
           <form
             action={async () => {
               "use server";

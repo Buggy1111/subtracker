@@ -70,9 +70,12 @@ describe('subscription actions', () => {
     const { createSubscription } = await import('../app/actions/subscriptions');
     const result = await createSubscription({
       name: 'Netflix',
+      currency: 'USD',
       amount: 15.99,
       billingCycle: 'monthly',
       nextBillingDate: '2026-05-01',
+      status: 'active',
+      notify: true,
     });
 
     expect(result.success).toBe(true);
@@ -83,9 +86,12 @@ describe('subscription actions', () => {
     const { createSubscription } = await import('../app/actions/subscriptions');
     const result = await createSubscription({
       name: '',
+      currency: 'USD',
       amount: -5,
       billingCycle: 'invalid' as 'monthly',
       nextBillingDate: 'bad-date',
+      status: 'active',
+      notify: true,
     });
 
     expect(result.success).toBe(false);
@@ -114,7 +120,7 @@ describe('subscription actions', () => {
 
   it('returns error when not authenticated', async () => {
     const { auth } = await import('@/lib/auth');
-    vi.mocked(auth).mockResolvedValueOnce(null);
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
 
     vi.resetModules();
     // Re-mock with null auth

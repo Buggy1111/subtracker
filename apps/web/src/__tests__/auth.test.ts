@@ -34,6 +34,7 @@ describe('auth configuration', () => {
   });
 
   it('exports auth, signIn, signOut, handlers', async () => {
+    vi.stubEnv('DATABASE_URL', 'postgresql://test:test@localhost:5432/test');
     const mod = await import('../../src/lib/auth');
     expect(mod.auth).toBeDefined();
     expect(mod.signIn).toBeDefined();
@@ -41,8 +42,7 @@ describe('auth configuration', () => {
     expect(mod.handlers).toBeDefined();
   });
 
-  it('uses DrizzleAdapter in production mode', async () => {
-    vi.stubEnv('NODE_ENV', 'production');
+  it('uses DrizzleAdapter when DATABASE_URL is a real connection', async () => {
     vi.stubEnv('DATABASE_URL', 'postgresql://test:test@localhost:5432/test');
 
     vi.resetModules();
@@ -52,8 +52,8 @@ describe('auth configuration', () => {
     expect(DrizzleAdapter).toHaveBeenCalled();
   });
 
-  it('uses JWT strategy in development mode', async () => {
-    vi.stubEnv('NODE_ENV', 'development');
+  it('uses JWT strategy when DATABASE_URL is missing or dummy', async () => {
+    vi.stubEnv('DATABASE_URL', 'postgresql://dummy:dummy@dummy:5432/dummy');
 
     vi.resetModules();
     const NextAuth = (await import('next-auth')).default;
@@ -61,7 +61,7 @@ describe('auth configuration', () => {
 
     const lastCall = vi.mocked(NextAuth).mock.lastCall;
     expect(lastCall).toBeDefined();
-    const config = lastCall![0] as Record<string, unknown>;
-    expect(config.session).toEqual({ strategy: 'jwt' });
+    const config = lastCall![0] as unknown as { session?: { strategy: string } };
+    expect(config.session?.strategy).toBe('jwt');
   });
 });
