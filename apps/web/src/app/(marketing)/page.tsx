@@ -57,7 +57,7 @@ export default function LandingPage() {
             SubTracker — open source subscription tracking
           </p>
           <div className="flex items-center gap-5">
-            <a href="https://github.com" className="text-[13px] font-medium text-zinc-500 hover:text-zinc-200 transition-colors">GitHub</a>
+            <a href="https://github.com/Buggy1111/subtracker" target="_blank" rel="noopener noreferrer" className="text-[13px] font-medium text-zinc-500 hover:text-zinc-200 transition-colors">GitHub</a>
           </div>
         </div>
       </footer>

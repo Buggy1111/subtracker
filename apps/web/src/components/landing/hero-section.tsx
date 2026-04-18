@@ -36,7 +36,7 @@ export function HeroSection() {
             Start tracking — it&apos;s free
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <Button variant="ghost" render={<a href="https://github.com" target="_blank" rel="noopener noreferrer" />} nativeButton={false}
+          <Button variant="ghost" render={<a href="https://github.com/Buggy1111/subtracker" target="_blank" rel="noopener noreferrer" />} nativeButton={false}
             className="h-[46px] px-6 text-zinc-500 text-[14px] hover:text-zinc-200 rounded-[12px] border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
             <Github className="mr-2 h-4 w-4" />
             Star on GitHub

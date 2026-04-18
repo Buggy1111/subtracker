@@ -117,7 +117,7 @@ export function LandingNav() {
             ))}
             <div className="h-3 w-px bg-white/[0.1] mx-0.5" />
             <a
-              href="https://github.com"
+              href="https://github.com/Buggy1111/subtracker"
               target="_blank"
               rel="noopener noreferrer"
               className="nav-link-item relative flex items-center gap-1.5 px-3.5 py-[5px] rounded-[9px] text-[13px] font-medium text-zinc-300 hover:text-white transition-all duration-250"
