@@ -3,45 +3,42 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { subscriptions, imports } from "@subtracker/db/schema";
+import {
+  confirmImportSchema,
+  type ConfirmImportInput,
+} from "@subtracker/db/validators";
 import { revalidatePath } from "next/cache";
 
-interface ImportSubscription {
-  name: string;
-  amount: number;
-  currency: string;
-  billingCycle: "monthly" | "yearly" | "weekly" | "quarterly";
-  categoryId?: string;
-  include: boolean;
-}
-
-export async function confirmImport(input: {
-  fileName: string;
-  bankDetected: string;
-  totalRows: number;
-  subscriptions: ImportSubscription[];
-}) {
+export async function confirmImport(input: ConfirmImportInput) {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return { success: false, error: "Not authenticated" };
 
-  const toImport = input.subscriptions.filter((s) => s.include);
-  if (toImport.length === 0) return { success: false, error: "No subscriptions selected" };
+  const parsed = confirmImportSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0].message };
+  }
 
-  // Create import record
+  const data = parsed.data;
+  const toImport = data.subscriptions.filter((s) => s.include);
+  if (toImport.length === 0) {
+    return { success: false, error: "No subscriptions selected" };
+  }
+
+  // Create import record (fileName is already sanitized by Zod transform)
   const [importRecord] = await db
     .insert(imports)
     .values({
       userId,
-      fileName: input.fileName,
+      fileName: data.fileName,
       fileType: "csv",
-      bankDetected: input.bankDetected,
-      rowCount: input.totalRows,
-      matchedCount: input.subscriptions.length,
+      bankDetected: data.bankDetected,
+      rowCount: data.totalRows,
+      matchedCount: data.subscriptions.length,
       importedCount: toImport.length,
     })
     .returning();
 
-  // Create subscriptions
   const nextMonth = new Date();
   nextMonth.setMonth(nextMonth.getMonth() + 1);
   const nextBillingDate = nextMonth.toISOString().split("T")[0];

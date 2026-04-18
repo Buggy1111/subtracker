@@ -313,9 +313,15 @@ describe('updateProfileSchema', () => {
 // Confirm Import Schema
 // ============================================================
 describe('confirmImportSchema', () => {
+  const baseMeta = {
+    fileName: 'statement.csv',
+    bankDetected: 'Fio',
+    totalRows: 100,
+  };
+
   it('accepts valid import confirmation', () => {
     const result = confirmImportSchema.parse({
-      importId: 'imp_123',
+      ...baseMeta,
       subscriptions: [
         {
           name: 'Netflix',
@@ -334,7 +340,7 @@ describe('confirmImportSchema', () => {
         },
         {
           name: 'Random charge',
-          amount: 5.00,
+          amount: 5.0,
           currency: 'USD',
           billingCycle: 'monthly',
           include: false,
@@ -347,7 +353,7 @@ describe('confirmImportSchema', () => {
 
   it('accepts import with existingId mapping', () => {
     const result = confirmImportSchema.parse({
-      importId: 'imp_456',
+      ...baseMeta,
       subscriptions: [
         {
           name: 'Netflix',
@@ -362,22 +368,39 @@ describe('confirmImportSchema', () => {
     expect(result.subscriptions[0].existingId).toBe('sub_existing_123');
   });
 
-  it('rejects missing importId', () => {
-    expect(() => confirmImportSchema.parse({
+  it('sanitizes the file name (strips path traversal + control chars)', () => {
+    const result = confirmImportSchema.parse({
+      ...baseMeta,
+      fileName: '../../etc/passwd\u0000',
       subscriptions: [],
-    })).toThrow();
+    });
+    expect(result.fileName).not.toContain('..');
+    expect(result.fileName).not.toContain('/');
+    expect(result.fileName).not.toContain('\u0000');
+  });
+
+  it('rejects missing file metadata', () => {
+    expect(() =>
+      confirmImportSchema.parse({
+        subscriptions: [],
+      }),
+    ).toThrow();
   });
 
   it('rejects subscription with invalid billingCycle', () => {
-    expect(() => confirmImportSchema.parse({
-      importId: 'imp_789',
-      subscriptions: [{
-        name: 'Test',
-        amount: 5,
-        currency: 'USD',
-        billingCycle: 'biweekly',
-        include: true,
-      }],
-    })).toThrow();
+    expect(() =>
+      confirmImportSchema.parse({
+        ...baseMeta,
+        subscriptions: [
+          {
+            name: 'Test',
+            amount: 5,
+            currency: 'USD',
+            billingCycle: 'biweekly',
+            include: true,
+          },
+        ],
+      }),
+    ).toThrow();
   });
 });

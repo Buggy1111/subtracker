@@ -50,8 +50,16 @@ export async function deleteAccount() {
   const userId = session?.user?.id;
   if (!userId) return { success: false, error: "Not authenticated" };
 
-  // Cascade delete handles related data
-  await db.delete(users).where(eq(users.id, userId));
-
-  return { success: true };
+  try {
+    // Cascade delete handles related data (accounts, sessions, subscriptions,
+    // payments, reminders, imports, user categories — see schema FKs)
+    await db.delete(users).where(eq(users.id, userId));
+    return { success: true };
+  } catch (err) {
+    console.error("deleteAccount failed", err);
+    return {
+      success: false,
+      error: "Could not delete your account. Please try again or contact support.",
+    };
+  }
 }

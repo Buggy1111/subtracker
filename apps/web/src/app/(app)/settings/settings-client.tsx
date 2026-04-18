@@ -34,11 +34,13 @@ export function SettingsClient({ profile }: SettingsClientProps) {
   const [reminderTime, setReminderTime] = useState(profile.reminderTime);
   const [weeklyDigest, setWeeklyDigest] = useState(profile.weeklyDigest);
   const [saved, setSaved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSave = () => {
     setSaved(false);
+    setErrorMsg(null);
     startTransition(async () => {
-      await updateProfile({
+      const result = await updateProfile({
         name: name || undefined,
         currency: currency || undefined,
         monthlyBudget: monthlyBudget ? parseFloat(monthlyBudget) : null,
@@ -46,14 +48,26 @@ export function SettingsClient({ profile }: SettingsClientProps) {
         reminderTime,
         weeklyDigest,
       });
+      if (!result?.success) {
+        setErrorMsg(result?.error ?? "Failed to save. Please try again.");
+        return;
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     });
   };
 
   const handleDelete = () => {
+    setErrorMsg(null);
     startTransition(async () => {
-      await deleteAccount();
+      const result = await deleteAccount();
+      if (!result?.success) {
+        setErrorMsg(
+          result?.error ?? "Failed to delete your account. Please try again.",
+        );
+        setShowDeleteConfirm(false);
+        return;
+      }
       await signOut({ redirectTo: "/" });
     });
   };
@@ -135,6 +149,13 @@ export function SettingsClient({ profile }: SettingsClientProps) {
           <Switch checked={weeklyDigest} onCheckedChange={setWeeklyDigest} />
         </div>
       </section>
+
+      {/* Error / status banner */}
+      {errorMsg && (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          {errorMsg}
+        </div>
+      )}
 
       {/* Save button */}
       <Button onClick={handleSave} disabled={isPending} className="w-full">

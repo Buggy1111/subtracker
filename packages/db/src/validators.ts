@@ -73,17 +73,42 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 // Import Schema
 // ============================================================
 
+// Sanitize a user-provided file name:
+// - strip null bytes and control characters
+// - strip path separators and parent-directory references
+// - limit length to prevent DB bloat / log flooding
+const fileNameSchema = z
+  .string()
+  .trim()
+  .min(1, "File name required")
+  .max(200, "File name too long")
+  .transform((s) =>
+    s
+      // drop control chars including NUL
+      .replace(/[\u0000-\u001f\u007f]/g, "")
+      // drop any path separators and drive prefixes
+      .replace(/[\\/]/g, "_")
+      // collapse ".." so directory escape is not possible
+      .replace(/\.{2,}/g, "."),
+  );
+
 export const confirmImportSchema = z.object({
-  importId: z.string(),
-  subscriptions: z.array(z.object({
-    name: z.string(),
-    amount: z.number().positive(),
-    currency: z.string(),
-    billingCycle: billingCycleEnum,
-    categoryId: z.string().optional(),
-    existingId: z.string().optional(),
-    include: z.boolean(),
-  })),
+  fileName: fileNameSchema,
+  bankDetected: z.string().max(64),
+  totalRows: z.number().int().min(0).max(1_000_000),
+  subscriptions: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(100),
+        amount: z.number().positive().max(99_999.99),
+        currency: currencySchema,
+        billingCycle: billingCycleEnum,
+        categoryId: z.string().optional(),
+        existingId: z.string().optional(),
+        include: z.boolean(),
+      }),
+    )
+    .max(1000, "Too many subscriptions in a single import"),
 });
 
 export type ConfirmImportInput = z.infer<typeof confirmImportSchema>;
