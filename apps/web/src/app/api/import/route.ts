@@ -6,11 +6,42 @@ import {
   detectEncoding,
   type ImportResult,
 } from "@subtracker/parsers";
+import { rateLimit } from "@/lib/rate-limit";
+
+const ALLOWED_MIME_TYPES = new Set([
+  "text/csv",
+  "application/vnd.ms-excel", // some browsers send this for .csv
+  "text/plain",
+  "application/csv",
+  "application/octet-stream", // Chrome on Windows sometimes
+]);
 
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  // Rate limit: max 10 imports per hour per user
+  const rl = rateLimit({
+    key: `import:user:${session.user.id}`,
+    max: 10,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!rl.allowed) {
+    const retryAfter = Math.ceil((rl.resetAt - Date.now()) / 1000);
+    return NextResponse.json(
+      { error: "Too many import requests. Try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(retryAfter),
+          "X-RateLimit-Limit": "10",
+          "X-RateLimit-Remaining": String(rl.remaining),
+          "X-RateLimit-Reset": String(rl.resetAt),
+        },
+      },
+    );
   }
 
   const formData = await request.formData();
@@ -20,8 +51,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  if (!file.name.endsWith(".csv")) {
-    return NextResponse.json({ error: "Only CSV files are supported" }, { status: 400 });
+  // Basic MIME + extension sniff (first-line filter, not a security boundary)
+  const nameIsCSV = file.name.toLowerCase().endsWith(".csv");
+  const typeIsAllowed = !file.type || ALLOWED_MIME_TYPES.has(file.type.toLowerCase());
+  if (!nameIsCSV || !typeIsAllowed) {
+    return NextResponse.json(
+      { error: "Only CSV files are supported" },
+      { status: 400 },
+    );
   }
 
   if (file.size > 5 * 1024 * 1024) {

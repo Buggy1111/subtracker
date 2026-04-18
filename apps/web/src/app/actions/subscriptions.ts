@@ -9,7 +9,7 @@ import {
   type CreateSubscriptionInput,
   type UpdateSubscriptionInput,
 } from "@subtracker/db/validators";
-import { eq, and, desc, asc } from "drizzle-orm";
+import { eq, and, desc, asc, or, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 type ActionResult<T = unknown> = {
@@ -70,7 +70,7 @@ export async function getCategories(): Promise<ActionResult<typeof categories.$i
       .from(categories)
       .where(
         // Global categories (userId = null) OR user's own
-        eq(categories.userId, userId)
+        or(isNull(categories.userId), eq(categories.userId, userId)),
       )
       .orderBy(asc(categories.sortOrder));
 
