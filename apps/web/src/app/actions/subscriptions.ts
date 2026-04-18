@@ -91,19 +91,23 @@ export async function createSubscription(
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const [created] = await db
-    .insert(subscriptions)
-    .values({
-      ...parsed.data,
-      amount: String(parsed.data.amount),
-      userId,
-    })
-    .returning();
+  try {
+    const [created] = await db
+      .insert(subscriptions)
+      .values({
+        ...parsed.data,
+        amount: String(parsed.data.amount),
+        userId,
+      })
+      .returning();
 
-  revalidatePath("/subscriptions");
-  revalidatePath("/dashboard");
+    revalidatePath("/subscriptions");
+    revalidatePath("/dashboard");
 
-  return { success: true, data: created };
+    return { success: true, data: created };
+  } catch {
+    return { success: false, error: "Failed to create subscription" };
+  }
 }
 
 export async function updateSubscription(
@@ -123,54 +127,70 @@ export async function updateSubscription(
     values.amount = String(parsed.data.amount);
   }
 
-  const [updated] = await db
-    .update(subscriptions)
-    .set(values)
-    .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-    .returning();
+  try {
+    const [updated] = await db
+      .update(subscriptions)
+      .set(values)
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+      .returning();
 
-  revalidatePath("/subscriptions");
-  revalidatePath("/dashboard");
+    if (!updated) return { success: false, error: "Subscription not found" };
 
-  return { success: true, data: updated };
+    revalidatePath("/subscriptions");
+    revalidatePath("/dashboard");
+
+    return { success: true, data: updated };
+  } catch {
+    return { success: false, error: "Failed to update subscription" };
+  }
 }
 
 export async function deleteSubscription(id: string): Promise<ActionResult> {
   const userId = await getAuthUserId();
   if (!userId) return { success: false, error: "Not authenticated" };
 
-  const [deleted] = await db
-    .delete(subscriptions)
-    .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-    .returning();
+  try {
+    const [deleted] = await db
+      .delete(subscriptions)
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+      .returning();
 
-  revalidatePath("/subscriptions");
-  revalidatePath("/dashboard");
+    if (!deleted) return { success: false, error: "Subscription not found" };
 
-  return { success: true, data: deleted };
+    revalidatePath("/subscriptions");
+    revalidatePath("/dashboard");
+
+    return { success: true, data: deleted };
+  } catch {
+    return { success: false, error: "Failed to delete subscription" };
+  }
 }
 
 export async function toggleSubscriptionPause(id: string): Promise<ActionResult> {
   const userId = await getAuthUserId();
   if (!userId) return { success: false, error: "Not authenticated" };
 
-  const [sub] = await db
-    .select()
-    .from(subscriptions)
-    .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
+  try {
+    const [sub] = await db
+      .select()
+      .from(subscriptions)
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
 
-  if (!sub) return { success: false, error: "Subscription not found" };
+    if (!sub) return { success: false, error: "Subscription not found" };
 
-  const newStatus = sub.status === "paused" ? "active" : "paused";
+    const newStatus = sub.status === "paused" ? "active" : "paused";
 
-  const [updated] = await db
-    .update(subscriptions)
-    .set({ status: newStatus, updatedAt: new Date() })
-    .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-    .returning();
+    const [updated] = await db
+      .update(subscriptions)
+      .set({ status: newStatus, updatedAt: new Date() })
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+      .returning();
 
-  revalidatePath("/subscriptions");
-  revalidatePath("/dashboard");
+    revalidatePath("/subscriptions");
+    revalidatePath("/dashboard");
 
-  return { success: true, data: updated };
+    return { success: true, data: updated };
+  } catch {
+    return { success: false, error: "Failed to toggle subscription" };
+  }
 }

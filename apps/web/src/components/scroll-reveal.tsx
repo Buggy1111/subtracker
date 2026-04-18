@@ -96,16 +96,51 @@ export function AnimatedStat({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [displayed, setDisplayed] = useState(value);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const hasAnimatedRef = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
+    const animateValue = () => {
+      const prefix = value.match(/^[^0-9]*/)?.[0] || "";
+      const suffix = value.match(/[^0-9.]*$/)?.[0] || "";
+      const numStr = value.replace(prefix, "").replace(suffix, "");
+      const target = parseFloat(numStr);
+
+      if (isNaN(target)) {
+        setDisplayed(value);
+        return;
+      }
+
+      const hasDecimal = numStr.includes(".");
+      const duration = 1200;
+      const startTime = performance.now();
+
+      const update = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = target * eased;
+
+        setDisplayed(
+          prefix + (hasDecimal ? current.toFixed(1) : Math.round(current).toString()) + suffix
+        );
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          setDisplayed(value);
+        }
+      };
+
+      requestAnimationFrame(update);
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
+        if (entry.isIntersecting && !hasAnimatedRef.current) {
+          hasAnimatedRef.current = true;
           animateValue();
           observer.unobserve(el);
         }
@@ -115,44 +150,7 @@ export function AnimatedStat({
 
     observer.observe(el);
     return () => observer.disconnect();
-  });
-
-  function animateValue() {
-    // Extract numeric part
-    const prefix = value.match(/^[^0-9]*/)?.[0] || "";
-    const suffix = value.match(/[^0-9.]*$/)?.[0] || "";
-    const numStr = value.replace(prefix, "").replace(suffix, "");
-    const target = parseFloat(numStr);
-
-    if (isNaN(target)) {
-      setDisplayed(value);
-      return;
-    }
-
-    const hasDecimal = numStr.includes(".");
-    const duration = 1200;
-    const startTime = performance.now();
-
-    function update(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = target * eased;
-
-      setDisplayed(
-        prefix + (hasDecimal ? current.toFixed(1) : Math.round(current).toString()) + suffix
-      );
-
-      if (progress < 1) {
-        requestAnimationFrame(update);
-      } else {
-        setDisplayed(value);
-      }
-    }
-
-    requestAnimationFrame(update);
-  }
+  }, [value]);
 
   return (
     <span ref={ref} className={className}>

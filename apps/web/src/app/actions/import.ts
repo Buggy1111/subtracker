@@ -25,40 +25,49 @@ export async function confirmImport(input: ConfirmImportInput) {
     return { success: false, error: "No subscriptions selected" };
   }
 
-  // Create import record (fileName is already sanitized by Zod transform)
-  const [importRecord] = await db
-    .insert(imports)
-    .values({
-      userId,
-      fileName: data.fileName,
-      fileType: "csv",
-      bankDetected: data.bankDetected,
-      rowCount: data.totalRows,
-      matchedCount: data.subscriptions.length,
-      importedCount: toImport.length,
-    })
-    .returning();
-
   const nextMonth = new Date();
   nextMonth.setMonth(nextMonth.getMonth() + 1);
   const nextBillingDate = nextMonth.toISOString().split("T")[0];
 
-  for (const sub of toImport) {
-    await db.insert(subscriptions).values({
-      userId,
-      name: sub.name,
-      amount: String(sub.amount),
-      currency: sub.currency,
-      billingCycle: sub.billingCycle,
-      nextBillingDate,
-      categoryId: sub.categoryId || null,
-      importSource: "csv",
-      importRef: importRecord.id,
+  try {
+    const importedCount = await db.transaction(async (tx) => {
+      const [importRecord] = await tx
+        .insert(imports)
+        .values({
+          userId,
+          fileName: data.fileName,
+          fileType: "csv",
+          bankDetected: data.bankDetected,
+          rowCount: data.totalRows,
+          matchedCount: data.subscriptions.length,
+          importedCount: toImport.length,
+        })
+        .returning();
+
+      if (toImport.length > 0) {
+        await tx.insert(subscriptions).values(
+          toImport.map((sub) => ({
+            userId,
+            name: sub.name,
+            amount: String(sub.amount),
+            currency: sub.currency,
+            billingCycle: sub.billingCycle,
+            nextBillingDate,
+            categoryId: sub.categoryId || null,
+            importSource: "csv" as const,
+            importRef: importRecord.id,
+          }))
+        );
+      }
+
+      return toImport.length;
     });
+
+    revalidatePath("/subscriptions");
+    revalidatePath("/dashboard");
+
+    return { success: true, importedCount };
+  } catch {
+    return { success: false, error: "Failed to save import — please try again" };
   }
-
-  revalidatePath("/subscriptions");
-  revalidatePath("/dashboard");
-
-  return { success: true, importedCount: toImport.length };
 }

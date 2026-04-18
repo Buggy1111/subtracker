@@ -4,7 +4,9 @@
 
 Open-source subscription tracker. Know exactly where your money goes every month.
 
-![SubTracker Dashboard](docs/screenshot-dashboard.png)
+![SubTracker](docs/screenshot-landing.png)
+
+🔗 **Live demo:** [subtracker-web-six.vercel.app](https://subtracker-web-six.vercel.app/)
 
 ## What works today
 
