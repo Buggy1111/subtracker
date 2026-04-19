@@ -12,5 +12,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // Playwright specs under e2e/ use @playwright/test's describe/test and
+    // must not be picked up by Vitest.
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/e2e/**'],
   },
 });
