@@ -7,6 +7,7 @@ import {
   confirmImportSchema,
   type ConfirmImportInput,
 } from "@subtracker/db/validators";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function confirmImport(input: ConfirmImportInput) {
@@ -29,45 +30,47 @@ export async function confirmImport(input: ConfirmImportInput) {
   nextMonth.setMonth(nextMonth.getMonth() + 1);
   const nextBillingDate = nextMonth.toISOString().split("T")[0];
 
+  // Note: Neon HTTP driver doesn't support transactions. We insert the import
+  // record first, then batch-insert subscriptions as a single atomic statement.
+  // If the batch insert fails, we clean up the orphan import record.
+  let importRecordId: string | null = null;
   try {
-    const importedCount = await db.transaction(async (tx) => {
-      const [importRecord] = await tx
-        .insert(imports)
-        .values({
-          userId,
-          fileName: data.fileName,
-          fileType: "csv",
-          bankDetected: data.bankDetected,
-          rowCount: data.totalRows,
-          matchedCount: data.subscriptions.length,
-          importedCount: toImport.length,
-        })
-        .returning();
+    const [importRecord] = await db
+      .insert(imports)
+      .values({
+        userId,
+        fileName: data.fileName,
+        fileType: "csv",
+        bankDetected: data.bankDetected,
+        rowCount: data.totalRows,
+        matchedCount: data.subscriptions.length,
+        importedCount: toImport.length,
+      })
+      .returning();
+    importRecordId = importRecord.id;
 
-      if (toImport.length > 0) {
-        await tx.insert(subscriptions).values(
-          toImport.map((sub) => ({
-            userId,
-            name: sub.name,
-            amount: String(sub.amount),
-            currency: sub.currency,
-            billingCycle: sub.billingCycle,
-            nextBillingDate,
-            categoryId: sub.categoryId || null,
-            importSource: "csv" as const,
-            importRef: importRecord.id,
-          }))
-        );
-      }
-
-      return toImport.length;
-    });
+    await db.insert(subscriptions).values(
+      toImport.map((sub) => ({
+        userId,
+        name: sub.name,
+        amount: String(sub.amount),
+        currency: sub.currency,
+        billingCycle: sub.billingCycle,
+        nextBillingDate,
+        categoryId: sub.categoryId || null,
+        importSource: "csv" as const,
+        importRef: importRecord.id,
+      }))
+    );
 
     revalidatePath("/subscriptions");
     revalidatePath("/dashboard");
 
-    return { success: true, importedCount };
+    return { success: true, importedCount: toImport.length };
   } catch {
+    if (importRecordId) {
+      await db.delete(imports).where(eq(imports.id, importRecordId)).catch(() => {});
+    }
     return { success: false, error: "Failed to save import — please try again" };
   }
 }
