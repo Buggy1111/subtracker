@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState, useTransition } from "react";
+import { SUPPORTED_CURRENCIES } from "@/lib/format";
 
 const BILLING_CYCLES = [
   { value: "monthly", label: "Monthly" },
@@ -137,12 +138,21 @@ export function SubscriptionForm({
 
         <div className="space-y-2">
           <Label htmlFor="currency">Currency</Label>
-          <Input
-            id="currency"
-            placeholder="USD"
-            maxLength={3}
-            {...register("currency")}
-          />
+          <Select
+            value={watch("currency") ?? "USD"}
+            onValueChange={(v) => setValue("currency", v ?? "USD", { shouldValidate: true })}
+          >
+            <SelectTrigger id="currency" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <SelectItem key={c.code} value={c.code}>
+                  {c.symbol} {c.code} — {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
