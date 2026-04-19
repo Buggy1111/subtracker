@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pause, Play, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pause, Play, Pencil, Trash2, XCircle, ExternalLink } from "lucide-react";
 import { useTransition } from "react";
 import { deleteSubscription, toggleSubscriptionPause } from "@/app/actions/subscriptions";
 import { formatCurrency } from "@/lib/format";
@@ -39,9 +39,15 @@ interface SubscriptionCardProps {
     nextBillingDate: string;
     logo?: string | null;
     color?: string | null;
+    cancellationUrl?: string | null;
+    cancellationDifficulty?: number | null;
     category?: { name: string; color: string } | null;
   };
   onEdit: (id: string) => void;
+}
+
+function difficultyLabel(n: number): string {
+  return ["", "Easy", "Simple", "Medium", "Hard", "Nightmare"][n] ?? "";
 }
 
 export function SubscriptionCard({ subscription, onEdit }: SubscriptionCardProps) {
@@ -80,6 +86,22 @@ export function SubscriptionCard({ subscription, onEdit }: SubscriptionCardProps
               >
                 {subscription.status}
               </Badge>
+              {subscription.cancellationUrl && (
+                <a
+                  href={subscription.cancellationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 text-[10px] text-rose-400/80 hover:text-rose-300 hover:underline"
+                  title={
+                    subscription.cancellationDifficulty
+                      ? `Difficulty: ${difficultyLabel(subscription.cancellationDifficulty)} (${subscription.cancellationDifficulty}/5)`
+                      : "Open cancellation page"
+                  }
+                >
+                  Cancel <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -117,6 +139,15 @@ export function SubscriptionCard({ subscription, onEdit }: SubscriptionCardProps
                 <Pencil className="mr-2 h-3.5 w-3.5" />
                 Edit
               </DropdownMenuItem>
+              {subscription.cancellationUrl && (
+                <DropdownMenuItem
+                  onClick={() => window.open(subscription.cancellationUrl!, "_blank", "noopener,noreferrer")}
+                >
+                  <XCircle className="mr-2 h-3.5 w-3.5" />
+                  Cancel this subscription
+                  <ExternalLink className="ml-auto h-3 w-3 text-zinc-500" />
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 onClick={() =>
                   startTransition(async () => { await toggleSubscriptionPause(subscription.id); })

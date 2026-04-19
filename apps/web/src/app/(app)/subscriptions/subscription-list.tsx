@@ -2,8 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search, X } from "lucide-react";
 import { SubscriptionCard } from "@/components/subscription-card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { formatCurrency } from "@/lib/format";
+import {
+  filterAndSortSubscriptions,
+  SORT_OPTIONS,
+  type SortKey,
+} from "@/lib/subscription-filter";
 
 type Subscription = {
   id: string;
@@ -13,6 +28,7 @@ type Subscription = {
   billingCycle: string;
   status: string;
   nextBillingDate: string;
+  createdAt: Date | string;
   logo?: string | null;
   color?: string | null;
 };
@@ -21,16 +37,22 @@ const FILTERS = ["all", "active", "paused", "trial", "cancelled"] as const;
 
 export function SubscriptionList({
   subscriptions,
+  currency = "USD",
 }: {
   subscriptions: Subscription[];
+  currency?: string;
 }) {
   const [filter, setFilter] = useState<string>("all");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortKey>("next-asc");
   const router = useRouter();
 
-  const filtered =
+  const statusFiltered =
     filter === "all"
       ? subscriptions
       : subscriptions.filter((s) => s.status === filter);
+
+  const visible = filterAndSortSubscriptions(statusFiltered, query, sort);
 
   const totalMonthly = subscriptions
     .filter((s) => s.status === "active")
@@ -59,13 +81,48 @@ export function SubscriptionList({
         <div className="text-sm">
           <span className="text-zinc-500">Monthly total: </span>
           <span className="font-mono font-semibold text-zinc-200 tabular-nums">
-            ${totalMonthly.toFixed(2)}
+            {formatCurrency(totalMonthly, currency)}
           </span>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-1">
+      {/* Search + Sort */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+          <Input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by name..."
+            className="pl-9"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:bg-white/[0.05] hover:text-zinc-300"
+              aria-label="Clear search"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        <Select value={sort} onValueChange={(v) => setSort((v ?? "next-asc") as SortKey)}>
+          <SelectTrigger className="w-full sm:w-60">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Status filters */}
+      <div className="flex gap-1 overflow-x-auto">
         {FILTERS.map((f) => (
           <Button
             key={f}
@@ -86,7 +143,7 @@ export function SubscriptionList({
 
       {/* Cards */}
       <div className="space-y-2">
-        {filtered.map((sub) => (
+        {visible.map((sub) => (
           <SubscriptionCard
             key={sub.id}
             subscription={sub}
@@ -95,9 +152,11 @@ export function SubscriptionList({
         ))}
       </div>
 
-      {filtered.length === 0 && (
+      {visible.length === 0 && (
         <div className="text-center py-12 text-zinc-500 text-sm">
-          No {filter} subscriptions found.
+          {query
+            ? `No subscriptions matching "${query}"`
+            : `No ${filter} subscriptions found.`}
         </div>
       )}
     </div>

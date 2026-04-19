@@ -3,11 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Upload } from "lucide-react";
 import Link from "next/link";
 import { getSubscriptions } from "@/app/actions/subscriptions";
+import { getProfile } from "@/app/actions/settings";
 import { SubscriptionList } from "./subscription-list";
 
 export default async function SubscriptionsPage() {
-  const result = await getSubscriptions();
+  const [result, profile] = await Promise.all([getSubscriptions(), getProfile()]);
   const subscriptions = result.data ?? [];
+  const currency = profile?.currency ?? "USD";
 
   return (
     <div className="space-y-6">
@@ -54,7 +56,7 @@ export default async function SubscriptionsPage() {
           </CardContent>
         </Card>
       ) : (
-        <SubscriptionList subscriptions={subscriptions} />
+        <SubscriptionList subscriptions={subscriptions} currency={currency} />
       )}
     </div>
   );

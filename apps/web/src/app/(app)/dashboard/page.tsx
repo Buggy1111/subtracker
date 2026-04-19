@@ -2,6 +2,7 @@ import { CreditCard, TrendingUp, Bell, DollarSign } from "lucide-react";
 import { getDashboardData, getMonthlyTrend } from "@/app/actions/dashboard";
 import { getProfile } from "@/app/actions/settings";
 import { formatCurrency } from "@/lib/format";
+import { budgetStatus } from "@/lib/budget";
 import { MonthlyTrendChart } from "@/components/monthly-trend-chart";
 import Link from "next/link";
 
@@ -13,7 +14,9 @@ export default async function DashboardPage() {
   ]);
 
   const currency = profile?.currency ?? "USD";
+  const budget = profile?.monthlyBudget ? parseFloat(profile.monthlyBudget) : null;
   const monthlySpend = data?.monthlySpend ?? 0;
+  const budget_ = budgetStatus(monthlySpend, budget);
   const annualProjection = data?.annualProjection ?? 0;
   const activeCount = data?.activeCount ?? 0;
   const nextRenewal = data?.nextRenewal;
@@ -95,6 +98,45 @@ export default async function DashboardPage() {
 
       {/* Charts placeholder + Category breakdown */}
       <div className="grid gap-4 md:grid-cols-2">
+        {/* Monthly Budget — only shown when configured */}
+        {budget_ && (
+          <div className="md:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-[15px] font-semibold tracking-tight">Monthly Budget</h3>
+                <p className="text-xs text-zinc-600 mt-0.5">
+                  {formatCurrency(budget_.spend, currency)} of {formatCurrency(budget_.budget, currency)} · {budget_.percent}%
+                </p>
+              </div>
+              <span
+                className={`text-sm font-mono tabular-nums font-semibold ${
+                  budget_.state === "over"
+                    ? "text-red-400"
+                    : budget_.state === "near"
+                      ? "text-amber-400"
+                      : "text-emerald-400"
+                }`}
+              >
+                {budget_.state === "over"
+                  ? `${formatCurrency(Math.abs(budget_.remaining), currency)} over`
+                  : `${formatCurrency(budget_.remaining, currency)} left`}
+              </span>
+            </div>
+            <div className="h-2.5 rounded-full bg-white/[0.04] overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  budget_.state === "over"
+                    ? "bg-gradient-to-r from-red-500 to-rose-500"
+                    : budget_.state === "near"
+                      ? "bg-gradient-to-r from-amber-500 to-orange-500"
+                      : "bg-gradient-to-r from-emerald-500 to-teal-500"
+                }`}
+                style={{ width: `${budget_.displayPercent}%` }}
+              />
+            </div>
+          </div>
+        )}
+
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
           <h3 className="text-[15px] font-semibold tracking-tight mb-1">
             Monthly Trend

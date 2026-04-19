@@ -32,6 +32,7 @@ export const createSubscriptionSchema = z.object({
   logo: z.string().optional(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
   cancellationUrl: z.string().url().optional().or(z.literal('')),
+  cancellationDifficulty: z.number().int().min(1).max(5).optional(),
   notify: z.boolean().default(true),
   notes: z.string().max(1000).optional(),
 });

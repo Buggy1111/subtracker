@@ -223,6 +223,48 @@ export function SubscriptionForm({
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="cancellationUrl">
+          Cancellation URL{" "}
+          <span className="text-xs text-zinc-500 font-normal">
+            (direct link to cancel this subscription)
+          </span>
+        </Label>
+        <Input
+          id="cancellationUrl"
+          type="url"
+          placeholder="https://netflix.com/cancelplan"
+          {...register("cancellationUrl")}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>
+          Cancellation Difficulty{" "}
+          <span className="text-xs text-zinc-500 font-normal">(1 = easy, 5 = hard)</span>
+        </Label>
+        <Select
+          value={String(watch("cancellationDifficulty") ?? "")}
+          onValueChange={(v) =>
+            setValue(
+              "cancellationDifficulty",
+              v ? parseInt(v) : undefined,
+            )
+          }
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Not set" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">1 — Easy (one click)</SelectItem>
+            <SelectItem value="2">2 — Simple (a form)</SelectItem>
+            <SelectItem value="3">3 — Medium (account settings)</SelectItem>
+            <SelectItem value="4">4 — Hard (chat or email)</SelectItem>
+            <SelectItem value="5">5 — Nightmare (phone call)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="notes">Notes</Label>
         <Input
           id="notes"
