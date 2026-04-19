@@ -1357,23 +1357,164 @@
   flex-wrap: wrap; gap: 12px;
 }
 
-/* Responsive */
-@media (max-width: 960px) {
-  .lv3-wrap { padding: 0 20px; }
+/* ============================
+   RESPONSIVE BREAKPOINTS
+   ============================
+   Mobile    < 640px
+   Tablet    640-1024px
+   Desktop   1024-1440px
+   Large     1440-1920px (default container)
+   XL        1920-2560px
+   4K        2560+px
+*/
+
+/* Large monitor: wider container for 1920px+ displays */
+@media (min-width: 1600px) {
+  .lv3-wrap { max-width: 1480px; }
+}
+@media (min-width: 1920px) {
+  .lv3-wrap { max-width: 1560px; padding: 0 48px; }
+  .lv3-hero h1 { font-size: clamp(72px, 6vw, 120px); }
+  .lv3-section-title { font-size: clamp(48px, 4vw, 80px); }
+  .lv3-cta-title { font-size: clamp(72px, 7vw, 144px); }
+  .lv3-stat-num { font-size: clamp(72px, 5.5vw, 104px); }
+}
+@media (min-width: 2560px) {
+  .lv3-wrap { max-width: 1800px; padding: 0 64px; }
+  .lv3-hero { padding: 120px 0 140px; }
+  .lv3-killer, .lv3-ledger, .lv3-import, .lv3-compare, .lv3-deploy, .lv3-stack { padding: 160px 0; }
+  .lv3-problem, .lv3-cta { padding: 200px 0; }
+}
+
+/* Tablet landscape + small desktop */
+@media (max-width: 1200px) {
+  .lv3-hero-grid { gap: 48px; }
+  .lv3-demo-grid { gap: 48px; }
+  .lv3-ledger-intro { gap: 48px; }
+}
+
+/* Tablet (portrait) — stack two-column layouts */
+@media (max-width: 1024px) {
+  .lv3-wrap { padding: 0 32px; }
+  .lv3-hero { padding: 72px 0 88px; }
   .lv3-hero-grid,
   .lv3-demo-grid,
+  .lv3-ledger-intro { grid-template-columns: 1fr; gap: 48px; }
   .lv3-compare-grid,
-  .lv3-deploy-grid,
-  .lv3-ledger-intro,
-  .lv3-stats-trio,
-  .lv3-footer-grid { grid-template-columns: 1fr; gap: 32px; }
-  .lv3-ledger-head { display: none; }
-  .lv3-ledger-row { grid-template-columns: 1fr; gap: 10px; padding: 22px 20px; }
-  .lv3-row-desc { font-size: 19px; }
-  .lv3-nav-links, .lv3-nav-demo { display: none; }
-  .lv3-hero { padding: 60px 0 80px; }
-  .lv3-killer, .lv3-problem, .lv3-ledger, .lv3-import, .lv3-compare, .lv3-deploy, .lv3-stack, .lv3-cta { padding: 80px 0; }
-  .lv3-receipt, .lv3-deploy-card { padding: 28px; }
-  .lv3-stack-tree { padding: 24px 20px; font-size: 12px; }
+  .lv3-deploy-grid { grid-template-columns: 1fr; gap: 20px; }
+  .lv3-stats-trio { grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .lv3-stat-card { padding: 44px 24px; }
+  .lv3-footer-grid { grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; }
+  .lv3-footer-grid > :nth-child(4) { grid-column: span 3; padding-top: 32px; border-top: 1px solid var(--lv3-border); }
+  .lv3-killer, .lv3-ledger, .lv3-import, .lv3-compare, .lv3-deploy, .lv3-stack, .lv3-cta { padding: 96px 0; }
+  .lv3-problem { padding: 112px 0; }
+  .lv3-ledger-head,
+  .lv3-ledger-row { grid-template-columns: 40px 100px 1fr 100px; padding: 20px 24px; }
+  .lv3-ledger-head > :nth-child(5),
+  .lv3-ledger-row > .lv3-row-status { display: none; }
+}
+
+/* Small tablet + large mobile */
+@media (max-width: 768px) {
+  .lv3-wrap { padding: 0 24px; }
+  .lv3-nav-links { display: none; }
+  .lv3-nav-demo span { display: none; }
+  .lv3-nav-cta { padding: 6px 10px 6px 8px; }
+  .lv3-nav-cta span:not(.lv3-badge) { display: none; }
+  .lv3-status { display: none; }
+
+  .lv3-hero { padding: 56px 0 72px; }
+  .lv3-hero h1 { font-size: clamp(44px, 10vw, 72px); }
+  .lv3-hero-sub { font-size: 16px; }
+  .lv3-hero-cta-row { flex-direction: column; align-items: stretch; }
+  .lv3-btn-primary, .lv3-btn-ghost { justify-content: center; }
+  .lv3-trust-row { flex-wrap: wrap; font-size: 10px; gap: 12px; }
+
+  .lv3-dash { padding: 20px; }
+  .lv3-dash::before { left: 16px; font-size: 9px; padding: 2px 8px; }
+  .lv3-kpi-value { font-size: 18px; }
+  .lv3-kpi { padding: 12px 14px; }
+
+  .lv3-stats-trio { grid-template-columns: 1fr; gap: 16px; }
   .lv3-stat-card { padding: 40px 28px; }
+  .lv3-stat-num { font-size: clamp(56px, 16vw, 88px); }
+  .lv3-killer-title { font-size: clamp(28px, 5vw, 40px); }
+
+  .lv3-problem-quote { font-size: clamp(32px, 6.5vw, 56px); }
+
+  .lv3-section-title { font-size: clamp(32px, 6vw, 56px); }
+  .lv3-section-head { font-size: 10px; letter-spacing: 0.16em; }
+
+  .lv3-ledger-head { display: none; }
+  .lv3-ledger-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 20px;
+  }
+  .lv3-ledger-row > .lv3-row-meta,
+  .lv3-ledger-row > .lv3-row-status { display: none; }
+  .lv3-row-desc { font-size: 18px; }
+  .lv3-row-num, .lv3-row-tag { display: inline-block; margin-right: 8px; }
+
+  .lv3-receipt { padding: 24px; font-size: 12px; }
+  .lv3-receipt-title { font-size: 24px; }
+  .lv3-receipt-line { font-size: 11px; gap: 12px; }
+
+  .lv3-deploy-card { padding: 24px; }
+  .lv3-deploy-title { font-size: 22px; }
+  .lv3-deploy-desc { font-size: 14px; }
+  .lv3-deploy-code { font-size: 11px; padding: 14px; }
+
+  .lv3-stack-tree { padding: 20px 16px; font-size: 11px; line-height: 1.85; }
+
+  .lv3-cta { padding: 96px 0; }
+  .lv3-cta-title { font-size: clamp(44px, 11vw, 84px); }
+  .lv3-cta-features { gap: 12px 20px; font-size: 13px; }
+  .lv3-cta-row { flex-direction: column; align-items: stretch; }
+  .lv3-cta-row .lv3-btn-primary, .lv3-cta-row .lv3-btn-ghost { justify-content: center; }
+
+  .lv3-footer-grid { grid-template-columns: 1fr 1fr; gap: 32px 24px; }
+  .lv3-footer-grid > :first-child { grid-column: span 2; }
+  .lv3-footer-bottom { flex-direction: column; gap: 8px; align-items: flex-start; font-size: 9px; }
+
+  .lv3-killer, .lv3-ledger, .lv3-import, .lv3-compare, .lv3-deploy, .lv3-stack { padding: 72px 0; }
+  .lv3-problem { padding: 96px 0; }
+  .lv3-problem::before { font-size: 120px; top: 40px; }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .lv3-wrap { padding: 0 16px; }
+  .lv3-nav-row { padding: 12px 0; }
+  .lv3-logo { font-size: 17px; }
+  .lv3-hero { padding: 40px 0 56px; }
+  .lv3-hero h1 { font-size: clamp(40px, 11vw, 56px); line-height: 1; }
+  .lv3-hero-kicker { font-size: 10px; margin-bottom: 24px; }
+  .lv3-hero-sub { font-size: 15px; margin-top: 24px; }
+  .lv3-kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .lv3-dash-title { font-size: 16px; }
+  .lv3-renewal-row { padding: 6px 0; font-size: 11px; }
+
+  .lv3-ticker-wrap { padding: 20px 0; }
+  .lv3-ticker-item { padding: 6px 14px; font-size: 12px; margin: 0 12px; }
+
+  .lv3-killer-kicker { font-size: 10px; margin-bottom: 14px; }
+  .lv3-stat-card { padding: 32px 20px; }
+
+  .lv3-problem-quote { font-size: clamp(28px, 8vw, 44px); }
+  .lv3-problem::before { font-size: 96px; top: 30px; }
+
+  .lv3-section-head { margin-bottom: 24px; }
+  .lv3-section-title { font-size: clamp(28px, 7.5vw, 44px); }
+
+  .lv3-ledger-row { padding: 18px 16px; }
+  .lv3-row-desc { font-size: 16px; }
+  .lv3-row-desc .lv3-row-sub { font-size: 12px; }
+
+  .lv3-terminal-body { padding: 16px; font-size: 11px; line-height: 1.8; }
+  .lv3-terminal-title { font-size: 10px; margin-left: 10px; }
+
+  .lv3-cta-title { font-size: clamp(36px, 12vw, 64px); }
+  .lv3-cta-cmd { font-size: 11px; padding: 8px 14px; }
+  .lv3-cta-cmd .lv3-hint { display: none; }
 }

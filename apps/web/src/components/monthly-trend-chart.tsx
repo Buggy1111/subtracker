@@ -166,7 +166,7 @@ export function MonthlyTrendChart({ data, currency }: Props) {
             x2={hover.x}
             y1={PADDING_Y}
             y2={baseY}
-            stroke="rgba(139,92,246,0.25)"
+            stroke="rgba(196,255,61,0.35)"
             strokeDasharray="3 3"
           />
         )}
