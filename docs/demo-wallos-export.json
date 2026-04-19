@@ -1,0 +1,100 @@
+{
+  "version": "2.42.0",
+  "exported_at": "2026-04-19 07:15:00",
+  "categories": [
+    { "id": 1, "name": "Music" },
+    { "id": 2, "name": "Utilities" },
+    { "id": 3, "name": "News & Reading" },
+    { "id": 4, "name": "Fitness" }
+  ],
+  "currencies": [
+    { "id": 1, "code": "EUR", "symbol": "€" },
+    { "id": 2, "code": "USD", "symbol": "$" }
+  ],
+  "subscriptions": [
+    {
+      "id": 101,
+      "name": "YouTube Premium",
+      "price": 13.99,
+      "currency_id": 1,
+      "currency": "EUR",
+      "cycle": 3,
+      "frequency": 1,
+      "next_payment": "2026-05-03",
+      "category_id": 1,
+      "url": "https://youtube.com/premium",
+      "notes": "Family plan with Music included",
+      "inactive": 0
+    },
+    {
+      "id": 102,
+      "name": "NordVPN",
+      "price": 11.99,
+      "currency_id": 1,
+      "currency": "EUR",
+      "cycle": 3,
+      "frequency": 1,
+      "next_payment": "2026-05-09",
+      "category_id": 2,
+      "url": "https://nordvpn.com",
+      "notes": null,
+      "inactive": 0
+    },
+    {
+      "id": 103,
+      "name": "1Password",
+      "price": 35.88,
+      "currency_id": 1,
+      "currency": "EUR",
+      "cycle": 6,
+      "frequency": 1,
+      "next_payment": "2026-11-01",
+      "category_id": 2,
+      "url": "https://1password.com",
+      "notes": "Individual plan, billed yearly",
+      "inactive": 0
+    },
+    {
+      "id": 104,
+      "name": "Obsidian Sync",
+      "price": 5.00,
+      "currency_id": 2,
+      "currency": "USD",
+      "cycle": 3,
+      "frequency": 1,
+      "next_payment": "2026-05-18",
+      "category_id": 2,
+      "url": "https://obsidian.md/sync",
+      "notes": null,
+      "inactive": 0
+    },
+    {
+      "id": 105,
+      "name": "The Economist",
+      "price": 59.00,
+      "currency_id": 1,
+      "currency": "EUR",
+      "cycle": 4,
+      "frequency": 1,
+      "next_payment": "2026-07-12",
+      "category_id": 3,
+      "url": "https://economist.com",
+      "notes": "Digital only",
+      "inactive": 0
+    },
+    {
+      "id": 106,
+      "name": "Strava",
+      "price": 7.99,
+      "currency_id": 1,
+      "currency": "EUR",
+      "cycle": 3,
+      "frequency": 1,
+      "next_payment": "2026-05-04",
+      "category_id": 4,
+      "url": "https://strava.com",
+      "notes": null,
+      "inactive": 0
+    }
+  ]
+}
