@@ -6,18 +6,25 @@ import { users, categories, subscriptions, payments, reminders, imports } from "
 import { updateProfileSchema, type UpdateProfileInput } from "@subtracker/db/validators";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { cache } from "react";
 
-export async function getProfile() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return null;
-
+// Server-action module exports are cached per request by Next.js, but wrapping
+// the inner fetch in React.cache also dedupes within a single render (layout +
+// page both calling getProfile → one DB hit instead of two).
+const loadProfile = cache(async (userId: string) => {
   try {
     const [user] = await db.select().from(users).where(eq(users.id, userId));
     return user ?? null;
   } catch {
     return null;
   }
+});
+
+export async function getProfile() {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return null;
+  return loadProfile(userId);
 }
 
 export async function updateProfile(input: UpdateProfileInput) {

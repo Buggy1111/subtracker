@@ -18,13 +18,22 @@ export async function getDashboardData() {
   const userId = session?.user?.id;
   if (!userId) return null;
 
+  // Fetch subscriptions and the category lookup in parallel — they have no
+  // data dependency on each other and each Neon round-trip is ~50ms.
   let allSubs;
+  let categoryRows: (typeof categories.$inferSelect)[];
   try {
-    allSubs = await db
-      .select()
-      .from(subscriptions)
-      .where(eq(subscriptions.userId, userId))
-      .orderBy(asc(subscriptions.nextBillingDate));
+    [allSubs, categoryRows] = await Promise.all([
+      db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .orderBy(asc(subscriptions.nextBillingDate)),
+      db
+        .select()
+        .from(categories)
+        .where(or(isNull(categories.userId), eq(categories.userId, userId))),
+    ]);
   } catch {
     // DB not available (dev mode with dummy URL)
     return null;
@@ -64,11 +73,6 @@ export async function getDashboardData() {
     );
   }
 
-  const categoryRows = await db
-    .select()
-    .from(categories)
-    .where(or(isNull(categories.userId), eq(categories.userId, userId)))
-    .catch(() => []);
   const categoryMap = new Map(categoryRows.map((c) => [c.id, c]));
 
   return {
@@ -101,6 +105,9 @@ export async function getDashboardData() {
         monthlyAmount: amount,
       };
     }),
+    // Expose the raw active subs so callers (like analytics/page.tsx) can
+    // avoid a second full-table fetch.
+    activeSubs,
   };
 }
 

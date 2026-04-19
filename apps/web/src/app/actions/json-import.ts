@@ -59,20 +59,25 @@ export async function importJson(
       .where(or(isNull(categories.userId), eq(categories.userId, userId)));
     const catByName = new Map(accessibleCats.map((c) => [c.name, c.id]));
 
-    // Create any user categories from the payload that don't already exist
-    for (const cat of parsed.categories) {
-      if (catByName.has(cat.name)) continue;
-      const [created] = await db
+    // Create any user categories from the payload that don't already exist.
+    // Single batched insert instead of one round-trip per category.
+    const newCats = parsed.categories.filter((c) => !catByName.has(c.name));
+    if (newCats.length > 0) {
+      const inserted = await db
         .insert(categories)
-        .values({
-          userId,
-          name: cat.name,
-          color: cat.color ?? "#64748B",
-          icon: null,
-          sortOrder: 100,
-        })
-        .returning({ id: categories.id });
-      catByName.set(cat.name, created.id);
+        .values(
+          newCats.map((c) => ({
+            userId,
+            name: c.name,
+            color: c.color ?? "#64748B",
+            icon: null,
+            sortOrder: 100,
+          })),
+        )
+        .returning({ id: categories.id, name: categories.name });
+      for (const row of inserted) {
+        catByName.set(row.name, row.id);
+      }
     }
 
     const rowsToInsert = parsed.subscriptions

@@ -1,18 +1,15 @@
 import { getDashboardData } from "@/app/actions/dashboard";
-import { getSubscriptions } from "@/app/actions/subscriptions";
 import { getProfile } from "@/app/actions/settings";
 import { formatCurrency } from "@/lib/format";
 
 export default async function AnalyticsPage() {
-  const [dashData, subsResult, profile] = await Promise.all([
+  const [dashData, profile] = await Promise.all([
     getDashboardData(),
-    getSubscriptions(),
     getProfile(),
   ]);
   const currency = profile?.currency ?? "USD";
 
-  const subs = subsResult.data ?? [];
-  const activeSubs = subs.filter((s) => s.status === "active");
+  const activeSubs = dashData?.activeSubs ?? [];
   const monthlySpend = dashData?.monthlySpend ?? 0;
   const annualProjection = dashData?.annualProjection ?? 0;
 

@@ -9,7 +9,7 @@ import {
   type CreateSubscriptionInput,
   type UpdateSubscriptionInput,
 } from "@subtracker/db/validators";
-import { eq, and, desc, asc, or, isNull } from "drizzle-orm";
+import { eq, and, desc, asc, or, isNull, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { guessCategoryName } from "@/lib/category-guess";
 
@@ -186,18 +186,32 @@ export async function autoCategorizeSubscriptions(): Promise<
     ]);
 
     const byName = new Map(userCats.map((c) => [c.name, c.id]));
-    let updated = 0;
 
+    // Bucket subscription IDs by target category so we can issue one UPDATE
+    // per category instead of one UPDATE per subscription.
+    const buckets = new Map<string, string[]>();
     for (const sub of userSubs) {
       const guess = guessCategoryName(sub.name);
       const catId = guess ? byName.get(guess) : null;
       if (!catId) continue;
-      await db
-        .update(subscriptions)
-        .set({ categoryId: catId, updatedAt: new Date() })
-        .where(and(eq(subscriptions.id, sub.id), eq(subscriptions.userId, userId)));
-      updated++;
+      const ids = buckets.get(catId) ?? [];
+      ids.push(sub.id);
+      buckets.set(catId, ids);
     }
+
+    let updated = 0;
+    const now = new Date();
+    await Promise.all(
+      Array.from(buckets.entries()).map(async ([catId, ids]) => {
+        await db
+          .update(subscriptions)
+          .set({ categoryId: catId, updatedAt: now })
+          .where(
+            and(eq(subscriptions.userId, userId), inArray(subscriptions.id, ids)),
+          );
+        updated += ids.length;
+      }),
+    );
 
     revalidatePath("/subscriptions");
     revalidatePath("/dashboard");
