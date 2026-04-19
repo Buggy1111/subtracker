@@ -3,6 +3,7 @@ import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PwaRegister } from "@/components/pwa-register";
+import { StructuredData } from "./structured-data";
 import "./globals.css";
 
 const display = Fraunces({
@@ -30,18 +31,81 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://subtracker-web-six.vercel.app";
+
 export const metadata: Metadata = {
-  title: "SubTracker — Know where your money goes",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: "SubTracker — Your subscriptions, under control.",
+    template: "%s · SubTracker",
+  },
   description:
-    "Open-source subscription tracker. Import bank statements, get renewal alerts, cut waste. Privacy-first, self-hostable.",
+    "Open-source subscription tracker. Import CSV from Fio, Revolut, or Wise. See every renewal before it hits. Self-hostable. Free forever. AGPL-3.0.",
   keywords: [
     "subscription tracker",
     "subscription manager",
+    "self-hosted",
+    "open source",
     "recurring payments",
     "personal finance",
-    "open source",
-    "self-hosted",
+    "CSV bank import",
+    "Fio Banka",
+    "Revolut",
+    "Wise",
+    "Wallos alternative",
+    "homelab",
+    "selfhosted",
+    "Next.js",
+    "React",
+    "privacy",
+    "AGPL",
   ],
+  authors: [{ name: "Michal Burget", url: "https://github.com/Buggy1111" }],
+  creator: "Michal Burget",
+  publisher: "Michal Burget",
+  category: "Finance",
+  applicationName: "SubTracker",
+  alternates: {
+    canonical: APP_URL,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: APP_URL,
+    siteName: "SubTracker",
+    title: "SubTracker — Your subscriptions, under control.",
+    description:
+      "Open-source subscription tracker. Import CSV from Fio, Revolut, or Wise. See every renewal before it hits. Self-hostable. Free forever.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SubTracker — Your subscriptions, under control. Dashboard preview with $142.50 monthly spend, upcoming renewals and live stats.",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SubTracker — Your subscriptions, under control.",
+    description:
+      "Open-source subscription tracker. CSV bank import, renewal calendar, self-hostable. Free forever.",
+    images: ["/og-image.png"],
+    creator: "@buggy1111",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
@@ -68,6 +132,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body className="min-h-screen antialiased">
+        <StructuredData />
         <ThemeProvider
           attribute="class"
           forcedTheme="dark"

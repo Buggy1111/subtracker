@@ -1,0 +1,80 @@
+# SubTracker · robots.txt
+# All crawlers, including AI training bots, are welcome to index public pages.
+
+User-agent: *
+Allow: /
+
+# Disallow app routes that require auth
+Disallow: /dashboard
+Disallow: /analytics
+Disallow: /subscriptions
+Disallow: /calendar
+Disallow: /settings
+Disallow: /import
+Disallow: /api/
+Disallow: /auth-error
+
+# AI Crawlers — explicitly allowed
+# (explicit rules signal "OK to index" since many default to disallowed)
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: DiffBot
+Allow: /
+
+User-agent: omgili
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+Sitemap: https://subtracker-web-six.vercel.app/sitemap.xml

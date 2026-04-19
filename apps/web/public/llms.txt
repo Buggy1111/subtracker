@@ -1,0 +1,34 @@
+# SubTracker
+
+> Open-source subscription tracker built for self-hosting. Import CSV from Fio, Revolut, or Wise, see every upcoming renewal, and own your data.
+
+SubTracker is an open-source web application (AGPL-3.0) that helps individuals track their recurring subscriptions. Users can connect bank CSV exports (Fio Banka, Revolut, Wise, or generic CSV) and the app automatically detects recurring payment patterns, suggesting them as subscriptions to add. The dashboard shows monthly spend, annual projection, upcoming renewals, and a renewal calendar. Self-hostable via Docker Compose, or deployable to Vercel with Neon Postgres.
+
+## Key facts
+- License: AGPL-3.0 (free, open-source, copyleft)
+- Stack: Next.js 16, React 19, TypeScript, Tailwind CSS v4, PostgreSQL, Drizzle ORM, Auth.js v5
+- Version: 0.5 (early access, April 2026)
+- Hosting: self-host (Docker) or Vercel + Neon Postgres
+- Authentication: Google OAuth, GitHub OAuth, or self-hosted credentials
+- Supported bank imports: Fio Banka, Revolut, Wise, generic CSV
+- Currencies: USD, EUR, GBP, CAD, JPY, CHF (via daily ECB rates)
+- Pre-filled services: 35+ (Netflix, Spotify, Claude, Figma, GitHub, Notion, NordVPN, Dropbox, iCloud+, 1Password, Linear, Twitch, Bitwarden, Strava, and more)
+- Privacy model: no telemetry, no bank login, data never leaves your server
+- Competition: Wallos (PHP-based, older architecture)
+
+## Who it's for
+Privacy-conscious developers and homelab operators who:
+- Want to know how much they spend on subscriptions monthly and annually
+- Prefer self-hosting over SaaS for financial data
+- Already run Docker or can deploy to Vercel free tier
+- Appreciate a modern TypeScript + React codebase they can read and contribute to
+
+## Links
+- Live demo: https://subtracker-web-six.vercel.app/
+- GitHub: https://github.com/Buggy1111/subtracker
+- Documentation: https://github.com/Buggy1111/subtracker/tree/main/docs
+- License: https://github.com/Buggy1111/subtracker/blob/main/LICENSE
+- Contributing: https://github.com/Buggy1111/subtracker/blob/main/CONTRIBUTING.md
+
+## Built by
+Michal Burget · self-taught developer from Moravia, Czech Republic. Built solo, reviewed by no marketing team.
