@@ -10,6 +10,7 @@ import {
 import { eq, or, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { guessCategoryName } from "@/lib/category-guess";
+import { projectNextBilling } from "@/lib/billing-projection";
 
 export async function confirmImport(input: ConfirmImportInput) {
   const session = await auth();
@@ -27,9 +28,18 @@ export async function confirmImport(input: ConfirmImportInput) {
     return { success: false, error: "No subscriptions selected" };
   }
 
-  const nextMonth = new Date();
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
-  const nextBillingDate = nextMonth.toISOString().split("T")[0];
+  const today = new Date();
+  const fallbackNextBilling = (() => {
+    const d = new Date(today);
+    d.setMonth(d.getMonth() + 1);
+    return d.toISOString().split("T")[0];
+  })();
+
+  function nextBillingFor(sub: (typeof toImport)[number]): string {
+    return sub.lastObserved
+      ? projectNextBilling(sub.lastObserved, sub.billingCycle, today)
+      : fallbackNextBilling;
+  }
 
   // Build a name->id map from the user's accessible categories so we can
   // auto-assign a category on import (Netflix -> Streaming, etc.).
@@ -73,7 +83,7 @@ export async function confirmImport(input: ConfirmImportInput) {
         amount: String(sub.amount),
         currency: sub.currency,
         billingCycle: sub.billingCycle,
-        nextBillingDate,
+        nextBillingDate: nextBillingFor(sub),
         categoryId: resolveCategoryId(sub),
         importSource: "csv" as const,
         importRef: importRecord.id,

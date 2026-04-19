@@ -106,13 +106,24 @@ export function ImportClient() {
         fileName,
         bankDetected: result.bankDetected,
         totalRows: result.totalRows,
-        subscriptions: result.detectedSubscriptions.map((sub, i) => ({
-          name: sub.name,
-          amount: sub.amount,
-          currency: sub.currency,
-          billingCycle: sub.estimatedCycle,
-          include: selections[i] ?? true,
-        })),
+        subscriptions: result.detectedSubscriptions.map((sub, i) => {
+          // Hand the server the latest transaction date so it can project
+          // the real next-billing instead of defaulting to today + 1 cycle.
+          const latest = sub.occurrences
+            .map((o) => new Date(o.date).getTime())
+            .reduce((a, b) => Math.max(a, b), 0);
+          const lastObserved = latest
+            ? new Date(latest).toISOString().split("T")[0]
+            : undefined;
+          return {
+            name: sub.name,
+            amount: sub.amount,
+            currency: sub.currency,
+            billingCycle: sub.estimatedCycle,
+            lastObserved,
+            include: selections[i] ?? true,
+          };
+        }),
       });
 
       if (res.success) {

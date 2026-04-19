@@ -106,6 +106,10 @@ export const confirmImportSchema = z.object({
         billingCycle: billingCycleEnum,
         categoryId: z.string().optional(),
         existingId: z.string().optional(),
+        // ISO date (YYYY-MM-DD) of the most recent transaction for this
+        // merchant. When present, the server projects the next billing date
+        // forward from this anchor instead of assuming "today + 1 cycle".
+        lastObserved: z.string().date().optional(),
         include: z.boolean(),
       }),
     )
