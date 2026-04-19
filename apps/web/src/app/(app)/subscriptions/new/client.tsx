@@ -7,13 +7,20 @@ import { QuickAdd } from "@/components/quick-add";
 import { createSubscription } from "@/app/actions/subscriptions";
 import { Button } from "@/components/ui/button";
 import { Zap, PenLine } from "lucide-react";
+import type { CreateSubscriptionInput } from "@subtracker/db/validators";
 
 interface NewSubscriptionClientProps {
   categories: { id: string; name: string; color: string }[];
+  prefill?: Partial<CreateSubscriptionInput>;
+  initialMode?: "quick" | "manual";
 }
 
-export function NewSubscriptionClient({ categories }: NewSubscriptionClientProps) {
-  const [mode, setMode] = useState<"quick" | "manual">("quick");
+export function NewSubscriptionClient({
+  categories,
+  prefill,
+  initialMode = "quick",
+}: NewSubscriptionClientProps) {
+  const [mode, setMode] = useState<"quick" | "manual">(initialMode);
   const router = useRouter();
 
   const categoryMap = Object.fromEntries(
@@ -50,6 +57,7 @@ export function NewSubscriptionClient({ categories }: NewSubscriptionClientProps
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
           <SubscriptionForm
             categories={categories}
+            defaultValues={prefill}
             onSubmit={async (data) => {
               const result = await createSubscription(data);
               if (result.success) {

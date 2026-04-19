@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { updateProfile, deleteAccount } from "@/app/actions/settings";
 import { autoCategorizeSubscriptions } from "@/app/actions/subscriptions";
+import { importJson } from "@/app/actions/json-import";
 import { signOut } from "next-auth/react";
 import { SUPPORTED_CURRENCIES } from "@/lib/format";
 
@@ -45,6 +46,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
   const [saved, setSaved] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [categorizedMsg, setCategorizedMsg] = useState<string | null>(null);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
 
   const handleSave = () => {
     setSaved(false);
@@ -65,6 +67,37 @@ export function SettingsClient({ profile }: SettingsClientProps) {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     });
+  };
+
+  const handleImportFile = (file: File) => {
+    setImportMsg(null);
+    setErrorMsg(null);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = typeof reader.result === "string" ? reader.result : "";
+      startTransition(async () => {
+        const result = await importJson(text);
+        if (!result.success) {
+          setErrorMsg(result.error);
+          return;
+        }
+        const sourceLabel =
+          result.source === "wallos"
+            ? " from Wallos"
+            : result.source === "subtracker"
+              ? " from SubTracker backup"
+              : "";
+        setImportMsg(
+          `Imported ${result.imported} subscription${result.imported === 1 ? "" : "s"}${sourceLabel}${
+            result.skipped > 0 ? ` (skipped ${result.skipped} duplicate${result.skipped === 1 ? "" : "s"})` : ""
+          }.`,
+        );
+        router.refresh();
+      });
+    };
+    reader.onerror = () => setErrorMsg("Could not read file");
+    reader.readAsText(file);
   };
 
   const handleAutoCategorize = () => {
@@ -185,23 +218,72 @@ export function SettingsClient({ profile }: SettingsClientProps) {
       </section>
 
       {/* Data tools */}
-      <section className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 space-y-4">
+      <section className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 space-y-6">
         <div>
           <h2 className="text-lg font-semibold">Data Tools</h2>
           <p className="text-sm text-zinc-500 mt-1">
-            Re-apply the category matcher to any subscriptions imported before categories were available.
+            Back up, restore, and migrate your subscription data.
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={handleAutoCategorize}
-          disabled={isPending}
-        >
-          {isPending ? "Working..." : "Auto-categorize subscriptions"}
-        </Button>
-        {categorizedMsg && (
-          <p className="text-sm text-emerald-400">{categorizedMsg}</p>
-        )}
+
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium text-zinc-300">Export</h3>
+          <p className="text-xs text-zinc-500">
+            Download a JSON backup of all your subscriptions and custom categories.
+          </p>
+          <a
+            href="/api/export"
+            download
+            className="inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            Export as JSON
+          </a>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium text-zinc-300">Import</h3>
+          <p className="text-xs text-zinc-500">
+            Upload a SubTracker backup or a Wallos export. Duplicates are skipped.
+          </p>
+          <input
+            id="json-input"
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImportFile(file);
+              e.target.value = "";
+            }}
+          />
+          <Button
+            variant="outline"
+            disabled={isPending}
+            onClick={() => document.getElementById("json-input")?.click()}
+          >
+            {isPending ? "Importing..." : "Import JSON"}
+          </Button>
+          {importMsg && (
+            <p className="text-sm text-emerald-400">{importMsg}</p>
+          )}
+        </div>
+
+        <div className="space-y-2 border-t border-white/[0.04] pt-5">
+          <h3 className="text-sm font-medium text-zinc-300">Auto-categorize</h3>
+          <p className="text-xs text-zinc-500">
+            Re-apply the category matcher to any uncategorized subscriptions.
+          </p>
+          <Button
+            variant="outline"
+            onClick={handleAutoCategorize}
+            disabled={isPending}
+          >
+            {isPending ? "Working..." : "Auto-categorize subscriptions"}
+          </Button>
+          {categorizedMsg && (
+            <p className="text-sm text-emerald-400">{categorizedMsg}</p>
+          )}
+        </div>
       </section>
 
       {/* Error / status banner */}
