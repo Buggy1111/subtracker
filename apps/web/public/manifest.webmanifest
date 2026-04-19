@@ -5,8 +5,8 @@
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#09090B",
-  "theme_color": "#6366F1",
+  "background_color": "#0a0a0b",
+  "theme_color": "#c4ff3d",
   "orientation": "portrait-primary",
   "categories": ["finance", "productivity", "utilities"],
   "icons": [

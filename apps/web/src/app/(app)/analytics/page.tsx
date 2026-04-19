@@ -81,8 +81,8 @@ export default async function AnalyticsPage() {
                       <div className="flex items-center gap-2">
                         <span className="text-zinc-500 w-5">{i + 1}.</span>
                         <div
-                          className="h-5 w-5 rounded flex items-center justify-center text-[10px] text-white font-bold"
-                          style={{ backgroundColor: sub.color ?? "#6366F1" }}
+                          className="h-5 w-5 rounded flex items-center justify-center text-[10px] font-bold"
+                          style={{ backgroundColor: sub.color ?? "#c4ff3d", color: sub.color ? "#fff" : "#0a0a0b" }}
                         >
                           {sub.name.charAt(0)}
                         </div>
@@ -95,7 +95,7 @@ export default async function AnalyticsPage() {
                     </div>
                     <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden ml-7">
                       <div
-                        className="h-full rounded-full bg-indigo-500"
+                        className="h-full rounded-full bg-[#c4ff3d]"
                         style={{ width: `${Math.min(percent, 100)}%` }}
                       />
                     </div>

@@ -198,7 +198,7 @@ export function ImportClient() {
                       }
                       className={`flex h-5 w-5 items-center justify-center rounded border transition-all ${
                         selections[i]
-                          ? "border-indigo-500 bg-indigo-500 text-white"
+                          ? "border-[#c4ff3d] bg-[#c4ff3d] text-[#0a0a0b]"
                           : "border-zinc-600"
                       }`}
                     >

@@ -64,9 +64,10 @@ export function SubscriptionCard({ subscription, onEdit }: SubscriptionCardProps
         <div className="flex items-center gap-3">
           {/* Logo/Color dot */}
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-white text-sm font-bold"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold"
             style={{
-              backgroundColor: subscription.color ?? "#6366F1",
+              backgroundColor: subscription.color ?? "#c4ff3d",
+              color: subscription.color ? "#fff" : "#0a0a0b",
             }}
           >
             {subscription.name.charAt(0).toUpperCase()}

@@ -48,11 +48,11 @@ export function AppSidebar({ user }: AppSidebarProps) {
     <Sidebar className="bg-[#0A0A0B] border-r border-white/[0.06]">
       <SidebarHeader className="border-b border-white/[0.06] px-4 py-3">
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-white font-bold text-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#c4ff3d] text-[#0a0a0b] font-bold text-sm" style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}>
             S
           </div>
-          <span className="text-[15px] font-semibold tracking-tight text-zinc-100">
-            SubTracker
+          <span className="text-[15px] font-semibold tracking-tight text-zinc-100" style={{ fontFamily: "var(--font-display)", fontWeight: 500, letterSpacing: "-0.02em" }}>
+            Sub<span style={{ color: "#c4ff3d", fontStyle: "italic" }}>·</span>Tracker
           </span>
         </Link>
       </SidebarHeader>

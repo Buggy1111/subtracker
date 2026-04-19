@@ -70,7 +70,7 @@ export default async function DashboardPage() {
             key={card.title}
             className={`rounded-2xl border p-6 transition-all duration-200 hover:border-white/[0.12] ${
               card.gradient
-                ? "border-indigo-500/[0.15] bg-gradient-to-br from-indigo-500/[0.08] to-purple-500/[0.04]"
+                ? "border-[#c4ff3d]/[0.2] bg-gradient-to-br from-[#c4ff3d]/[0.08] to-[#c4ff3d]/[0.02]"
                 : "border-white/[0.06] bg-white/[0.02]"
             }`}
           >
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
             <div
               className={`text-3xl font-bold font-mono tracking-tight tabular-nums ${
                 card.gradient
-                  ? "bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent"
+                  ? "text-[#c4ff3d]"
                   : "text-zinc-100"
               }`}
             >
@@ -199,7 +199,7 @@ export default async function DashboardPage() {
                 <div className="flex items-center gap-3">
                   <div
                     className="h-8 w-8 rounded-md flex items-center justify-center text-white text-xs font-bold"
-                    style={{ backgroundColor: sub.color ?? "#6366F1" }}
+                    style={{ backgroundColor: sub.color ?? "#c4ff3d", color: sub.color ? "#fff" : "#0a0a0b" }}
                   >
                     {sub.name.charAt(0)}
                   </div>

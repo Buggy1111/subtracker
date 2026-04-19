@@ -105,12 +105,12 @@ export function MonthlyTrendChart({ data, currency }: Props) {
       >
         <defs>
           <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6366F1" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#6366F1" stopOpacity="0" />
+            <stop offset="0%" stopColor="#c4ff3d" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#c4ff3d" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="trend-line" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8B5CF6" />
-            <stop offset="100%" stopColor="#6366F1" />
+            <stop offset="0%" stopColor="#c4ff3d" />
+            <stop offset="100%" stopColor="#c4ff3d" />
           </linearGradient>
         </defs>
 
@@ -152,8 +152,8 @@ export function MonthlyTrendChart({ data, currency }: Props) {
               cx={p.x}
               cy={p.y}
               r={hoverIdx === i ? 5 : 3}
-              fill={hoverIdx === i ? "#fff" : "#8B5CF6"}
-              stroke={hoverIdx === i ? "#8B5CF6" : "none"}
+              fill={hoverIdx === i ? "#fff" : "#c4ff3d"}
+              stroke={hoverIdx === i ? "#c4ff3d" : "none"}
               strokeWidth="2"
               className="transition-all duration-150"
             />

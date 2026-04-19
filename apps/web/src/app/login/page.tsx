@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#09090B] p-4 overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center bg-[#0a0a0b] p-4 overflow-hidden">
       {/* Background glow */}
-      <div className="pointer-events-none fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-indigo-500/[0.06] blur-[100px]" />
+      <div className="pointer-events-none fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#c4ff3d]/[0.06] blur-[100px]" />
 
       <div className="relative z-10 w-full max-w-sm">
         {/* Logo — clickable, goes back to landing */}
@@ -14,14 +14,15 @@ export default function LoginPage() {
           <Link
             href="/"
             aria-label="Back to homepage"
-            className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500 text-white font-bold text-xl shadow-[0_0_40px_rgba(99,102,241,0.3)] transition-transform hover:scale-105"
+            className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#c4ff3d] text-[#0a0a0b] font-bold text-xl shadow-[0_0_40px_rgba(196,255,61,0.3)] transition-transform hover:scale-105"
+            style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}
           >
             S
           </Link>
-          <h1 className="mt-5 text-2xl font-bold tracking-[-0.02em] text-zinc-50">
-            Welcome to SubTracker
+          <h1 className="mt-5 text-3xl tracking-[-0.03em]" style={{ fontFamily: "var(--font-display)", fontWeight: 400, color: "#e8e4d9" }}>
+            Welcome to Sub<span style={{ color: "#c4ff3d", fontStyle: "italic" }}>·</span>Tracker
           </h1>
-          <p className="mt-1.5 text-sm text-zinc-500">
+          <p className="mt-2 text-sm" style={{ color: "#77736b" }}>
             Sign in to track your subscriptions
           </p>
         </div>
@@ -59,6 +60,30 @@ export default function LoginPage() {
               Continue with GitHub
             </Button>
           </form>
+
+          {process.env.NODE_ENV === "development" && (
+            <>
+              <div className="flex items-center gap-3 py-1">
+                <div className="flex-1 h-px bg-white/[0.06]" />
+                <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: "#77736b" }}>dev only</span>
+                <div className="flex-1 h-px bg-white/[0.06]" />
+              </div>
+              <form
+                action={async () => {
+                  "use server";
+                  await signIn("credentials", { email: "dev@subtracker.app", redirectTo: "/dashboard" });
+                }}
+              >
+                <Button
+                  className="w-full h-11 rounded-xl font-medium transition-all duration-200"
+                  type="submit"
+                  style={{ background: "#c4ff3d", color: "#0a0a0b" }}
+                >
+                  → Quick dev login
+                </Button>
+              </form>
+            </>
+          )}
         </div>
 
         <p className="text-center text-xs text-zinc-600 mt-6">

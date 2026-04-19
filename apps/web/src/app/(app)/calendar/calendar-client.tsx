@@ -76,7 +76,7 @@ export function CalendarClient({ subscriptions, fallbackCurrency }: Props) {
           {!isCurrentMonth && (
             <button
               onClick={() => setOffset(0)}
-              className="ml-3 text-xs text-zinc-500 hover:text-indigo-400 font-normal"
+              className="ml-3 text-xs text-zinc-500 hover:text-[#c4ff3d] font-normal"
             >
               Today
             </button>
@@ -126,7 +126,7 @@ export function CalendarClient({ subscriptions, fallbackCurrency }: Props) {
                 day === null
                   ? "border-transparent"
                   : isToday
-                    ? "border-indigo-500/30 bg-indigo-500/[0.05]"
+                    ? "border-[#c4ff3d]/30 bg-[#c4ff3d]/[0.05]"
                     : "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03]"
               }`}
             >
@@ -134,7 +134,7 @@ export function CalendarClient({ subscriptions, fallbackCurrency }: Props) {
                 <>
                   <span
                     className={`text-xs ${
-                      isToday ? "text-indigo-400 font-semibold" : "text-zinc-500"
+                      isToday ? "text-[#c4ff3d] font-semibold" : "text-zinc-500"
                     }`}
                   >
                     {day}
@@ -145,7 +145,7 @@ export function CalendarClient({ subscriptions, fallbackCurrency }: Props) {
                         <div
                           key={sub.id}
                           className="rounded px-1 py-0.5 text-[10px] text-white truncate"
-                          style={{ backgroundColor: sub.color ?? "#6366F1" }}
+                          style={{ backgroundColor: sub.color ?? "#c4ff3d", color: sub.color ? "#fff" : "#0a0a0b" }}
                           title={`${sub.name} · ${formatCurrency(parseFloat(sub.amount), sub.currency ?? fallbackCurrency)}`}
                         >
                           {sub.name}
@@ -183,7 +183,7 @@ export function CalendarClient({ subscriptions, fallbackCurrency }: Props) {
                     <span key={sub.id} className="flex items-center gap-1.5">
                       <span
                         className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: sub.color ?? "#6366F1" }}
+                        style={{ backgroundColor: sub.color ?? "#c4ff3d" }}
                       />
                       <span className="text-zinc-300">{sub.name}</span>
                       <span className="text-zinc-600 font-mono text-xs">

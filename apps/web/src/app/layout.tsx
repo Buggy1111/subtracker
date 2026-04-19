@@ -1,30 +1,31 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
-const display = Space_Grotesk({
+const display = Fraunces({
   variable: "--font-display",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  axes: ["SOFT", "opsz"],
 });
 
-const body = DM_Sans({
+const body = Geist({
   variable: "--font-sans",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const mono = JetBrains_Mono({
+const mono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 });
 
 export const viewport: Viewport = {
-  themeColor: "#6366F1",
+  themeColor: "#0a0a0b",
   width: "device-width",
   initialScale: 1,
 };
