@@ -1,10 +1,13 @@
 import { CreditCard, TrendingUp, Bell, DollarSign } from "lucide-react";
 import { getDashboardData } from "@/app/actions/dashboard";
+import { getProfile } from "@/app/actions/settings";
+import { formatCurrency } from "@/lib/format";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const data = await getDashboardData();
+  const [data, profile] = await Promise.all([getDashboardData(), getProfile()]);
 
+  const currency = profile?.currency ?? "USD";
   const monthlySpend = data?.monthlySpend ?? 0;
   const annualProjection = data?.annualProjection ?? 0;
   const activeCount = data?.activeCount ?? 0;
@@ -14,7 +17,7 @@ export default async function DashboardPage() {
   const kpiCards = [
     {
       title: "Monthly Spend",
-      value: `$${monthlySpend.toFixed(2)}`,
+      value: formatCurrency(monthlySpend, currency),
       subtitle: activeCount > 0 ? `${activeCount} active subscriptions` : "Add subscriptions to start",
       icon: DollarSign,
       gradient: true,
@@ -30,12 +33,14 @@ export default async function DashboardPage() {
       value: nextRenewal
         ? new Date(nextRenewal.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
         : "\u2014",
-      subtitle: nextRenewal ? `${nextRenewal.name} · $${parseFloat(nextRenewal.amount).toFixed(2)}` : "No upcoming renewals",
+      subtitle: nextRenewal
+        ? `${nextRenewal.name} · ${formatCurrency(parseFloat(nextRenewal.amount), nextRenewal.currency ?? currency)}`
+        : "No upcoming renewals",
       icon: Bell,
     },
     {
       title: "Annual Projection",
-      value: `$${annualProjection.toFixed(2)}`,
+      value: formatCurrency(annualProjection, currency),
       subtitle: "Estimated yearly total",
       icon: TrendingUp,
     },
@@ -112,7 +117,7 @@ export default async function DashboardPage() {
                       {cat.categoryId === "uncategorized" ? "Uncategorized" : cat.categoryId}
                     </span>
                     <span className="font-mono text-sm text-zinc-200 tabular-nums">
-                      ${cat.monthlyAmount.toFixed(2)}/mo
+                      {formatCurrency(cat.monthlyAmount, currency)}/mo
                     </span>
                   </div>
                 ))}
@@ -149,7 +154,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-mono text-sm font-semibold text-zinc-200 tabular-nums">
-                    ${parseFloat(sub.amount).toFixed(2)}
+                    {formatCurrency(parseFloat(sub.amount), sub.currency ?? currency)}
                   </p>
                   <p className="text-xs text-zinc-600">
                     {new Date(sub.nextBillingDate + "T00:00:00").toLocaleDateString("en-US", {

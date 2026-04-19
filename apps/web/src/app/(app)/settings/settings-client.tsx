@@ -6,8 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { updateProfile, deleteAccount } from "@/app/actions/settings";
 import { signOut } from "next-auth/react";
+import { SUPPORTED_CURRENCIES } from "@/lib/format";
 
 interface SettingsClientProps {
   profile: {
@@ -92,13 +100,18 @@ export function SettingsClient({ profile }: SettingsClientProps) {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="currency">Default Currency</Label>
-            <Input
-              id="currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              maxLength={3}
-              placeholder="USD"
-            />
+            <Select value={currency} onValueChange={(v) => setCurrency(v ?? "USD")}>
+              <SelectTrigger id="currency" className="w-full">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.symbol} {c.code} — {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="budget">Monthly Budget</Label>

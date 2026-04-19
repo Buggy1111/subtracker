@@ -1,11 +1,15 @@
 import { getDashboardData } from "@/app/actions/dashboard";
 import { getSubscriptions } from "@/app/actions/subscriptions";
+import { getProfile } from "@/app/actions/settings";
+import { formatCurrency } from "@/lib/format";
 
 export default async function AnalyticsPage() {
-  const [dashData, subsResult] = await Promise.all([
+  const [dashData, subsResult, profile] = await Promise.all([
     getDashboardData(),
     getSubscriptions(),
+    getProfile(),
   ]);
+  const currency = profile?.currency ?? "USD";
 
   const subs = subsResult.data ?? [];
   const activeSubs = subs.filter((s) => s.status === "active");
@@ -56,15 +60,15 @@ export default async function AnalyticsPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
               <p className="text-xs text-zinc-500 mb-1">Monthly Spend</p>
-              <p className="text-2xl font-bold font-mono tabular-nums text-zinc-100">${monthlySpend.toFixed(2)}</p>
+              <p className="text-2xl font-bold font-mono tabular-nums text-zinc-100">{formatCurrency(monthlySpend, currency)}</p>
             </div>
             <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
               <p className="text-xs text-zinc-500 mb-1">Annual Projection</p>
-              <p className="text-2xl font-bold font-mono tabular-nums text-zinc-100">${annualProjection.toFixed(2)}</p>
+              <p className="text-2xl font-bold font-mono tabular-nums text-zinc-100">{formatCurrency(annualProjection, currency)}</p>
             </div>
             <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
               <p className="text-xs text-zinc-500 mb-1">Daily Average</p>
-              <p className="text-2xl font-bold font-mono tabular-nums text-zinc-100">${(monthlySpend / 30).toFixed(2)}</p>
+              <p className="text-2xl font-bold font-mono tabular-nums text-zinc-100">{formatCurrency(monthlySpend / 30, currency)}</p>
             </div>
           </div>
 
@@ -88,7 +92,7 @@ export default async function AnalyticsPage() {
                         <span className="text-zinc-200">{sub.name}</span>
                       </div>
                       <span className="font-mono text-zinc-200 tabular-nums">
-                        ${sub.monthly.toFixed(2)}/mo
+                        {formatCurrency(sub.monthly, currency)}/mo
                         <span className="text-zinc-600 ml-1">({percent.toFixed(0)}%)</span>
                       </span>
                     </div>

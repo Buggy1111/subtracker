@@ -12,6 +12,7 @@ import {
 import { MoreHorizontal, Pause, Play, Pencil, Trash2 } from "lucide-react";
 import { useTransition } from "react";
 import { deleteSubscription, toggleSubscriptionPause } from "@/app/actions/subscriptions";
+import { formatCurrency } from "@/lib/format";
 
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
@@ -86,8 +87,7 @@ export function SubscriptionCard({ subscription, onEdit }: SubscriptionCardProps
         <div className="flex items-center gap-2">
           <div className="text-right">
             <p className="font-mono font-semibold text-zinc-100 tabular-nums">
-              {subscription.currency === "USD" ? "$" : subscription.currency + " "}
-              {amount.toFixed(2)}
+              {formatCurrency(amount, subscription.currency)}
               <span className="text-xs text-zinc-500 font-normal ml-0.5">
                 {CYCLE_LABELS[subscription.billingCycle] ?? ""}
               </span>

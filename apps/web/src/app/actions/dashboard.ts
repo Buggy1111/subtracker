@@ -77,7 +77,12 @@ export async function getDashboardData() {
     activeCount: activeSubs.length,
     totalCount: allSubs.length,
     nextRenewal: nextRenewal
-      ? { name: nextRenewal.name, date: nextRenewal.nextBillingDate, amount: nextRenewal.amount }
+      ? {
+          name: nextRenewal.name,
+          date: nextRenewal.nextBillingDate,
+          amount: nextRenewal.amount,
+          currency: nextRenewal.currency,
+        }
       : null,
     upcomingRenewals: upcomingRenewals.map((s) => ({
       id: s.id,
