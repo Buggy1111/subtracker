@@ -1,11 +1,16 @@
 import { CreditCard, TrendingUp, Bell, DollarSign } from "lucide-react";
-import { getDashboardData } from "@/app/actions/dashboard";
+import { getDashboardData, getMonthlyTrend } from "@/app/actions/dashboard";
 import { getProfile } from "@/app/actions/settings";
 import { formatCurrency } from "@/lib/format";
+import { MonthlyTrendChart } from "@/components/monthly-trend-chart";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const [data, profile] = await Promise.all([getDashboardData(), getProfile()]);
+  const [data, profile, trend] = await Promise.all([
+    getDashboardData(),
+    getProfile(),
+    getMonthlyTrend(6),
+  ]);
 
   const currency = profile?.currency ?? "USD";
   const monthlySpend = data?.monthlySpend ?? 0;
@@ -94,12 +99,14 @@ export default async function DashboardPage() {
           <h3 className="text-[15px] font-semibold tracking-tight mb-1">
             Monthly Trend
           </h3>
-          <p className="text-xs text-zinc-600 mb-6">Last 6 months</p>
-          <div className="flex h-48 items-center justify-center text-sm text-zinc-600">
-            {activeCount > 0
-              ? "Chart coming soon"
-              : "Add subscriptions to see spending trends"}
-          </div>
+          <p className="text-xs text-zinc-600 mb-4">Last 6 months</p>
+          {activeCount > 0 && trend ? (
+            <MonthlyTrendChart data={trend} currency={currency} />
+          ) : (
+            <div className="flex h-48 items-center justify-center text-sm text-zinc-600">
+              Add subscriptions to see spending trends
+            </div>
+          )}
         </div>
 
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
@@ -113,8 +120,12 @@ export default async function DashboardPage() {
                 .sort((a, b) => b.monthlyAmount - a.monthlyAmount)
                 .map((cat) => (
                   <div key={cat.categoryId} className="flex items-center justify-between">
-                    <span className="text-sm text-zinc-400 truncate">
-                      {cat.categoryId === "uncategorized" ? "Uncategorized" : cat.categoryId}
+                    <span className="flex items-center gap-2 text-sm text-zinc-400 truncate">
+                      <span
+                        className="h-2 w-2 rounded-full shrink-0"
+                        style={{ backgroundColor: cat.color }}
+                      />
+                      {cat.name}
                     </span>
                     <span className="font-mono text-sm text-zinc-200 tabular-nums">
                       {formatCurrency(cat.monthlyAmount, currency)}/mo

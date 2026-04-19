@@ -11,6 +11,7 @@ import {
 } from "@subtracker/db/validators";
 import { eq, and, desc, asc, or, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { guessCategoryName } from "@/lib/category-guess";
 
 type ActionResult<T = unknown> = {
   success: boolean;
@@ -163,6 +164,47 @@ export async function deleteSubscription(id: string): Promise<ActionResult> {
     return { success: true, data: deleted };
   } catch {
     return { success: false, error: "Failed to delete subscription" };
+  }
+}
+
+export async function autoCategorizeSubscriptions(): Promise<
+  ActionResult<{ updated: number }>
+> {
+  const userId = await getAuthUserId();
+  if (!userId) return { success: false, error: "Not authenticated" };
+
+  try {
+    const [userSubs, userCats] = await Promise.all([
+      db
+        .select()
+        .from(subscriptions)
+        .where(and(eq(subscriptions.userId, userId), isNull(subscriptions.categoryId))),
+      db
+        .select()
+        .from(categories)
+        .where(or(isNull(categories.userId), eq(categories.userId, userId))),
+    ]);
+
+    const byName = new Map(userCats.map((c) => [c.name, c.id]));
+    let updated = 0;
+
+    for (const sub of userSubs) {
+      const guess = guessCategoryName(sub.name);
+      const catId = guess ? byName.get(guess) : null;
+      if (!catId) continue;
+      await db
+        .update(subscriptions)
+        .set({ categoryId: catId, updatedAt: new Date() })
+        .where(and(eq(subscriptions.id, sub.id), eq(subscriptions.userId, userId)));
+      updated++;
+    }
+
+    revalidatePath("/subscriptions");
+    revalidatePath("/dashboard");
+
+    return { success: true, data: { updated } };
+  } catch {
+    return { success: false, error: "Failed to categorize subscriptions" };
   }
 }
 

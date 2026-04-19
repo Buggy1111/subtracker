@@ -1,4 +1,6 @@
 import { getSubscriptions } from "@/app/actions/subscriptions";
+import { getProfile } from "@/app/actions/settings";
+import { formatCurrency } from "@/lib/format";
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -6,8 +8,9 @@ const MONTH_NAMES = [
 ];
 
 export default async function CalendarPage() {
-  const result = await getSubscriptions();
+  const [result, profile] = await Promise.all([getSubscriptions(), getProfile()]);
   const subs = (result.data ?? []).filter((s) => s.status === "active");
+  const fallbackCurrency = profile?.currency ?? "USD";
 
   const now = new Date();
   const year = now.getFullYear();
@@ -129,7 +132,7 @@ export default async function CalendarPage() {
                       />
                       <span className="text-zinc-300">{sub.name}</span>
                       <span className="text-zinc-600 font-mono text-xs">
-                        ${parseFloat(sub.amount).toFixed(2)}
+                        {formatCurrency(parseFloat(sub.amount), sub.currency ?? fallbackCurrency)}
                       </span>
                     </span>
                   ))}

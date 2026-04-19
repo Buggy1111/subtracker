@@ -2,13 +2,14 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { subscriptions, imports } from "@subtracker/db/schema";
+import { subscriptions, imports, categories } from "@subtracker/db/schema";
 import {
   confirmImportSchema,
   type ConfirmImportInput,
 } from "@subtracker/db/validators";
-import { eq } from "drizzle-orm";
+import { eq, or, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { guessCategoryName } from "@/lib/category-guess";
 
 export async function confirmImport(input: ConfirmImportInput) {
   const session = await auth();
@@ -29,6 +30,22 @@ export async function confirmImport(input: ConfirmImportInput) {
   const nextMonth = new Date();
   nextMonth.setMonth(nextMonth.getMonth() + 1);
   const nextBillingDate = nextMonth.toISOString().split("T")[0];
+
+  // Build a name->id map from the user's accessible categories so we can
+  // auto-assign a category on import (Netflix -> Streaming, etc.).
+  const categoryRows = await db
+    .select()
+    .from(categories)
+    .where(or(isNull(categories.userId), eq(categories.userId, userId)))
+    .catch(() => []);
+  const categoryByName = new Map(categoryRows.map((c) => [c.name, c.id]));
+
+  function resolveCategoryId(sub: (typeof toImport)[number]): string | null {
+    if (sub.categoryId) return sub.categoryId;
+    const guess = guessCategoryName(sub.name);
+    if (!guess) return null;
+    return categoryByName.get(guess) ?? null;
+  }
 
   // Note: Neon HTTP driver doesn't support transactions. We insert the import
   // record first, then batch-insert subscriptions as a single atomic statement.
@@ -57,7 +74,7 @@ export async function confirmImport(input: ConfirmImportInput) {
         currency: sub.currency,
         billingCycle: sub.billingCycle,
         nextBillingDate,
-        categoryId: sub.categoryId || null,
+        categoryId: resolveCategoryId(sub),
         importSource: "csv" as const,
         importRef: importRecord.id,
       }))

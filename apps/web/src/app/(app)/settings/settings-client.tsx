@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateProfile, deleteAccount } from "@/app/actions/settings";
+import { autoCategorizeSubscriptions } from "@/app/actions/subscriptions";
 import { signOut } from "next-auth/react";
 import { SUPPORTED_CURRENCIES } from "@/lib/format";
 
@@ -43,6 +44,7 @@ export function SettingsClient({ profile }: SettingsClientProps) {
   const [weeklyDigest, setWeeklyDigest] = useState(profile.weeklyDigest);
   const [saved, setSaved] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [categorizedMsg, setCategorizedMsg] = useState<string | null>(null);
 
   const handleSave = () => {
     setSaved(false);
@@ -62,6 +64,25 @@ export function SettingsClient({ profile }: SettingsClientProps) {
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+    });
+  };
+
+  const handleAutoCategorize = () => {
+    setCategorizedMsg(null);
+    setErrorMsg(null);
+    startTransition(async () => {
+      const result = await autoCategorizeSubscriptions();
+      if (!result.success) {
+        setErrorMsg(result.error ?? "Failed to auto-categorize.");
+        return;
+      }
+      const n = result.data?.updated ?? 0;
+      setCategorizedMsg(
+        n === 0
+          ? "Nothing to categorize — all subscriptions already have a category."
+          : `Auto-categorized ${n} subscription${n === 1 ? "" : "s"}.`,
+      );
+      router.refresh();
     });
   };
 
@@ -161,6 +182,26 @@ export function SettingsClient({ profile }: SettingsClientProps) {
           </div>
           <Switch checked={weeklyDigest} onCheckedChange={setWeeklyDigest} />
         </div>
+      </section>
+
+      {/* Data tools */}
+      <section className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Data Tools</h2>
+          <p className="text-sm text-zinc-500 mt-1">
+            Re-apply the category matcher to any subscriptions imported before categories were available.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={handleAutoCategorize}
+          disabled={isPending}
+        >
+          {isPending ? "Working..." : "Auto-categorize subscriptions"}
+        </Button>
+        {categorizedMsg && (
+          <p className="text-sm text-emerald-400">{categorizedMsg}</p>
+        )}
       </section>
 
       {/* Error / status banner */}
