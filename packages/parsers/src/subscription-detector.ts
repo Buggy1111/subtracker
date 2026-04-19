@@ -71,11 +71,17 @@ export function detectSubscriptions(
 ): DetectedSubscription[] {
   if (transactions.length === 0) return [];
 
-  const grouped = groupByMerchant(transactions);
+  // Only consider outgoing payments — salary, refunds, and top-ups look
+  // recurring but aren't subscriptions.
+  const debits = transactions.filter((t) => t.type === "debit");
+
+  const grouped = groupByMerchant(debits);
   const detected: DetectedSubscription[] = [];
 
   for (const [, txns] of grouped) {
-    if (txns.length < 2) continue;
+    // Require 3+ occurrences so one-off pairs (e.g. two trips to the same
+    // shop a month apart) don't get flagged as monthly subscriptions.
+    if (txns.length < 3) continue;
 
     const intervals = calculateIntervals(txns);
     if (intervals.length === 0) continue;
