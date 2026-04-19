@@ -5,22 +5,57 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileText, Check, X, Loader2 } from "lucide-react";
+import { Upload, FileText, Check, Loader2, FileJson } from "lucide-react";
 import { confirmImport } from "@/app/actions/import";
+import { importJson } from "@/app/actions/json-import";
 import type { ImportResult, DetectedSubscription } from "@subtracker/parsers";
 
 type Step = "upload" | "review" | "done";
 
 export function ImportClient() {
   const [step, setStep] = useState<Step>("upload");
+  const [mode, setMode] = useState<"csv" | "json">("csv");
   const [result, setResult] = useState<ImportResult | null>(null);
   const [fileName, setFileName] = useState("");
   const [selections, setSelections] = useState<Record<number, boolean>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [importedCount, setImportedCount] = useState(0);
+  const [jsonSourceLabel, setJsonSourceLabel] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleJsonUpload = useCallback((file: File) => {
+    setError(null);
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = typeof reader.result === "string" ? reader.result : "";
+      startTransition(async () => {
+        const res = await importJson(text);
+        setIsUploading(false);
+        if (!res.success) {
+          setError(res.error);
+          return;
+        }
+        setImportedCount(res.imported);
+        setJsonSourceLabel(
+          res.source === "wallos"
+            ? "Wallos export"
+            : res.source === "subtracker"
+              ? "SubTracker backup"
+              : "JSON file",
+        );
+        setFileName(file.name);
+        setStep("done");
+      });
+    };
+    reader.onerror = () => {
+      setError("Could not read file");
+      setIsUploading(false);
+    };
+    reader.readAsText(file);
+  }, []);
 
   const handleUpload = useCallback(async (file: File) => {
     setError(null);
@@ -99,7 +134,7 @@ export function ImportClient() {
           <h3 className="text-lg font-semibold">Import Complete</h3>
           <p className="text-muted-foreground mt-1">
             {importedCount} subscription{importedCount !== 1 ? "s" : ""} imported
-            from {fileName}.
+            {jsonSourceLabel ? ` from ${jsonSourceLabel}` : ` from ${fileName}`}.
           </p>
           <Button className="mt-6" onClick={() => router.push("/subscriptions")}>
             View Subscriptions
@@ -207,28 +242,72 @@ export function ImportClient() {
     );
   }
 
-  // Upload step
+  // Upload step — CSV or JSON, chosen via tabs
+  const isCsv = mode === "csv";
+
   return (
     <Card>
-      <CardContent className="py-8">
+      <CardContent className="py-6 space-y-4">
+        {/* Mode toggle */}
+        <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1">
+          <Button
+            variant={isCsv ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => {
+              setMode("csv");
+              setError(null);
+            }}
+            className="flex-1"
+          >
+            <FileText className="mr-1.5 h-3.5 w-3.5" />
+            Bank CSV
+          </Button>
+          <Button
+            variant={!isCsv ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => {
+              setMode("json");
+              setError(null);
+            }}
+            className="flex-1"
+          >
+            <FileJson className="mr-1.5 h-3.5 w-3.5" />
+            JSON / Wallos
+          </Button>
+        </div>
+
         <div
-          onDrop={handleDrop}
+          onDrop={isCsv ? handleDrop : (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file) handleJsonUpload(file);
+          }}
           onDragOver={(e) => e.preventDefault()}
           className="border-2 border-dashed border-white/[0.08] rounded-xl p-12 text-center transition-colors hover:border-white/[0.15] cursor-pointer"
-          onClick={() => document.getElementById("csv-input")?.click()}
+          onClick={() =>
+            document.getElementById(isCsv ? "csv-input" : "json-input-dropzone")?.click()
+          }
         >
           {isUploading ? (
             <Loader2 className="mx-auto h-10 w-10 animate-spin text-zinc-400" />
-          ) : (
+          ) : isCsv ? (
             <Upload className="mx-auto h-10 w-10 text-zinc-500" />
+          ) : (
+            <FileJson className="mx-auto h-10 w-10 text-zinc-500" />
           )}
           <p className="text-zinc-400 mt-4">
             {isUploading
-              ? "Analyzing your bank statement..."
-              : "Drag & drop your CSV file here, or click to browse"}
+              ? isCsv
+                ? "Analyzing your bank statement..."
+                : "Reading your backup..."
+              : isCsv
+                ? "Drag & drop your CSV file here, or click to browse"
+                : "Drag & drop a SubTracker backup or Wallos export, or click to browse"}
           </p>
           <p className="text-xs text-zinc-600 mt-2">
-            Supports: Fio Banka, Revolut, Wise, and generic CSV
+            {isCsv
+              ? "Supports: Fio Banka, Revolut, Wise, and generic CSV"
+              : "Supports: SubTracker JSON export, Wallos export, or any JSON with a 'subscriptions' array"}
           </p>
           <input
             id="csv-input"
@@ -238,12 +317,24 @@ export function ImportClient() {
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) handleUpload(file);
+              e.target.value = "";
+            }}
+          />
+          <input
+            id="json-input-dropzone"
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleJsonUpload(file);
+              e.target.value = "";
             }}
           />
         </div>
 
         {error && (
-          <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
             {error}
           </div>
         )}
