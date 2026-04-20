@@ -919,6 +919,7 @@
   padding: 120px 0;
   border-bottom: 1px solid var(--lv3-border);
   position: relative;
+  overflow: hidden;
 }
 .lv3-killer::before {
   content: ''; position: absolute;
@@ -1188,6 +1189,10 @@
   border-radius: 12px;
   background: var(--lv3-bg-card);
   position: relative; transition: all 0.2s;
+  /* Grid items default to min-width:auto which expands to min-content.
+     The <pre> .lv3-deploy-code inside forces that to be the full command
+     width. Explicit min-width:0 lets the card shrink into its 1fr column. */
+  min-width: 0;
 }
 .lv3-deploy-card:hover { border-color: var(--lv3-border-bright); transform: translateY(-2px); }
 .lv3-deploy-icon {
@@ -1214,6 +1219,7 @@
   font-size: 12px; color: var(--lv3-fg-dim);
   overflow-x: auto; line-height: 1.8;
   white-space: pre;
+  min-width: 0;
 }
 .lv3-deploy-code .lv3-term-prompt { color: var(--lv3-accent); }
 .lv3-deploy-code .lv3-kw { color: var(--lv3-fg); }
