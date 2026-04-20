@@ -676,6 +676,61 @@
 }
 .lv3-nav-cta:hover { border-color: rgba(196, 255, 61, 0.4); color: var(--lv3-accent); }
 .lv3-nav-cta svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* Hamburger — hidden on desktop, revealed at the tablet/mobile breakpoint. */
+.lv3-nav-menu-btn {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  margin-left: 4px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--lv3-border);
+  border-radius: 10px;
+  color: var(--lv3-fg-dim);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.lv3-nav-menu-btn:hover { color: var(--lv3-fg); border-color: var(--lv3-border-bright); }
+.lv3-nav-menu-btn:focus-visible {
+  outline: 2px solid var(--lv3-accent);
+  outline-offset: 2px;
+}
+.lv3-nav-menu-btn svg { width: 20px; height: 20px; }
+
+.lv3-nav-drawer {
+  display: none;
+  border-top: 1px solid var(--lv3-border);
+  background: rgba(10, 10, 11, 0.96);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+}
+.lv3-nav-drawer-inner {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 12px 0 20px;
+}
+.lv3-nav-drawer a {
+  padding: 14px 16px;
+  color: var(--lv3-fg-dim);
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+  transition: background 0.15s, color 0.15s;
+}
+.lv3-nav-drawer a:hover,
+.lv3-nav-drawer a:focus-visible {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--lv3-fg);
+  outline: none;
+}
+.lv3-nav-drawer a.lv3-active {
+  color: var(--lv3-accent);
+  background: rgba(196, 255, 61, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(196, 255, 61, 0.18);
+}
+
 .lv3-nav-cta .lv3-badge {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 2px 6px;
@@ -1399,8 +1454,14 @@
   .lv3-ledger-intro { gap: 48px; }
 }
 
-/* Tablet (portrait) — stack two-column layouts */
+/* Tablet (portrait) — stack two-column layouts.
+   At ≤1024 the horizontal section link pill no longer fits comfortably
+   alongside the CTAs, so we hide it and expose the hamburger drawer. */
 @media (max-width: 1024px) {
+  .lv3-nav-links { display: none; }
+  .lv3-nav-menu-btn { display: inline-flex; }
+  .lv3-nav-drawer-open { display: block; }
+
   .lv3-wrap { padding: 0 32px; }
   .lv3-hero { padding: 72px 0 88px; }
   .lv3-hero-grid,
@@ -1423,7 +1484,6 @@
 /* Small tablet + large mobile */
 @media (max-width: 768px) {
   .lv3-wrap { padding: 0 24px; }
-  .lv3-nav-links { display: none; }
   .lv3-nav-demo span { display: none; }
   .lv3-nav-cta { padding: 6px 10px 6px 8px; }
   .lv3-nav-cta span:not(.lv3-badge) { display: none; }

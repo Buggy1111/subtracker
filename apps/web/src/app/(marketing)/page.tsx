@@ -1,7 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+const NAV_SECTIONS = [
+  { href: "#stats", label: "stats" },
+  { href: "#features", label: "features" },
+  { href: "#import", label: "import" },
+  { href: "#compare", label: "vs wallos" },
+  { href: "#deploy", label: "self-host" },
+  { href: "#stack", label: "stack" },
+] as const;
 
 const SERVICES = [
   { name: "Netflix", letter: "N", color: "#E50914", price: "$15.99" },
@@ -34,8 +43,13 @@ const FEATURES = [
 ];
 
 export default function LandingPage() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
-    const links = document.querySelectorAll<HTMLAnchorElement>(".lv3-nav-links a");
+    // Scroll-spy across both inline desktop links and mobile drawer links.
+    const links = document.querySelectorAll<HTMLAnchorElement>(
+      ".lv3-nav-links a, .lv3-nav-drawer a",
+    );
     const sections = [...links]
       .map((a) => document.querySelector(a.getAttribute("href") ?? ""))
       .filter((el): el is Element => !!el);
@@ -57,12 +71,36 @@ export default function LandingPage() {
     return () => io.disconnect();
   }, []);
 
+  // Close drawer on Escape so users can dismiss without aiming at the X.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  // Clicking the brand while already on the landing page is always meant as
+  // "take me back to the top". Without this, Next.js Link short-circuits the
+  // same-route navigation and nothing happens.
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (typeof window === "undefined") return;
+    if (window.location.pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setMenuOpen(false);
+    }
+  };
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div className="lv3">
       <nav className="lv3-nav">
         <div className="lv3-wrap lv3-nav-row">
           <div className="lv3-nav-brand">
-            <Link href="/" className="lv3-logo">
+            <Link href="/" className="lv3-logo" onClick={handleLogoClick}>
               Sub<span className="lv3-dot">·</span>Tracker
             </Link>
             <span className="lv3-status">
@@ -71,12 +109,9 @@ export default function LandingPage() {
           </div>
 
           <div className="lv3-nav-links">
-            <a href="#stats">stats</a>
-            <a href="#features">features</a>
-            <a href="#import">import</a>
-            <a href="#compare">vs wallos</a>
-            <a href="#deploy">self-host</a>
-            <a href="#stack">stack</a>
+            {NAV_SECTIONS.map((s) => (
+              <a key={s.href} href={s.href}>{s.label}</a>
+            ))}
           </div>
 
           <div className="lv3-nav-ctas">
@@ -94,6 +129,43 @@ export default function LandingPage() {
               <span>GitHub</span>
               <span className="lv3-badge">v0.5</span>
             </a>
+            <button
+              type="button"
+              className="lv3-nav-menu-btn"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="lv3-nav-drawer"
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {menuOpen ? (
+                  <>
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                  </>
+                ) : (
+                  <>
+                    <line x1="4" y1="7" x2="20" y2="7" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="17" x2="20" y2="17" />
+                  </>
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="lv3-nav-drawer"
+          className={`lv3-nav-drawer${menuOpen ? " lv3-nav-drawer-open" : ""}`}
+          aria-hidden={!menuOpen}
+        >
+          <div className="lv3-wrap lv3-nav-drawer-inner">
+            {NAV_SECTIONS.map((s) => (
+              <a key={s.href} href={s.href} onClick={closeMenu}>
+                {s.label}
+              </a>
+            ))}
           </div>
         </div>
       </nav>

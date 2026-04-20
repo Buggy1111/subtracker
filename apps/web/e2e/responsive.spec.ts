@@ -54,11 +54,60 @@ test.describe("mobile nav (iphone-se)", () => {
 
   test("desktop nav links are hidden, GitHub CTA stays reachable", async ({ page }) => {
     await page.goto("/", { waitUntil: "networkidle" });
-    // At ≤768px the inline nav link list is hidden; we still want a GitHub
+    // At ≤1024px the inline nav link pill is hidden; we still want a GitHub
     // CTA somewhere on the landing page so mobile users can star/fork.
     await expect(page.locator(".lv3-nav-links")).toBeHidden();
     const gh = page.locator('a[href*="github.com/Buggy1111/subtracker"]').first();
     await expect(gh).toBeVisible();
+  });
+
+  test("hamburger opens drawer with section links and closes after tap", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    const btn = page.getByRole("button", { name: /open menu/i });
+    await expect(btn).toBeVisible();
+
+    // Drawer starts closed
+    const drawer = page.locator("#lv3-nav-drawer");
+    await expect(drawer).toHaveAttribute("aria-hidden", "true");
+
+    await btn.click();
+    await expect(drawer).toHaveAttribute("aria-hidden", "false");
+    await expect(drawer.locator("a", { hasText: /stats/i })).toBeVisible();
+    await expect(drawer.locator("a", { hasText: /features/i })).toBeVisible();
+
+    // Tapping a section link scrolls + closes the drawer
+    await drawer.locator("a", { hasText: /features/i }).click();
+    await expect(drawer).toHaveAttribute("aria-hidden", "true");
+    // URL hash reflects navigation target
+    await expect(page).toHaveURL(/#features$/);
+  });
+
+  test("brand logo scroll-to-top when already on /", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    // Scroll well down the page first
+    await page.evaluate(() => window.scrollTo(0, 2000));
+    await page.waitForTimeout(200);
+    const beforeY = await page.evaluate(() => window.scrollY);
+    expect(beforeY).toBeGreaterThan(500);
+
+    await page.locator("a.lv3-logo").click();
+    // Smooth scroll → poll briefly until we're at / near the top
+    await page.waitForFunction(() => window.scrollY < 20, null, { timeout: 2000 });
+    const afterY = await page.evaluate(() => window.scrollY);
+    expect(afterY).toBeLessThan(20);
+  });
+});
+
+test.describe("tablet nav (ipad-mini)", () => {
+  test.use({ viewport: { width: 768, height: 1024 } });
+
+  test("hamburger is visible on tablet portrait and drawer works", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await expect(page.locator(".lv3-nav-links")).toBeHidden();
+    const btn = page.getByRole("button", { name: /open menu/i });
+    await expect(btn).toBeVisible();
+    await btn.click();
+    await expect(page.locator("#lv3-nav-drawer")).toHaveAttribute("aria-hidden", "false");
   });
 });
 
