@@ -677,21 +677,26 @@
 .lv3-nav-cta:hover { border-color: rgba(196, 255, 61, 0.4); color: var(--lv3-accent); }
 .lv3-nav-cta svg { width: 14px; height: 14px; flex-shrink: 0; }
 
-/* Hamburger — hidden on desktop, revealed at the tablet/mobile breakpoint. */
+/* Hamburger — hidden on desktop, revealed at the tablet/mobile breakpoint.
+   Coloured to match the accent so it visually announces itself against the
+   dark bar, matching the v0.5/LIVE pill treatment. */
 .lv3-nav-menu-btn {
   display: none;
   align-items: center; justify-content: center;
   width: 40px; height: 40px;
   margin-left: 4px;
   padding: 0;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--lv3-border);
+  background: rgba(196, 255, 61, 0.06);
+  border: 1px solid rgba(196, 255, 61, 0.28);
   border-radius: 10px;
-  color: var(--lv3-fg-dim);
+  color: var(--lv3-accent);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.lv3-nav-menu-btn:hover { color: var(--lv3-fg); border-color: var(--lv3-border-bright); }
+.lv3-nav-menu-btn:hover {
+  background: rgba(196, 255, 61, 0.12);
+  border-color: rgba(196, 255, 61, 0.55);
+}
 .lv3-nav-menu-btn:focus-visible {
   outline: 2px solid var(--lv3-accent);
   outline-offset: 2px;
@@ -1471,8 +1476,14 @@
   .lv3-deploy-grid { grid-template-columns: 1fr; gap: 20px; }
   .lv3-stats-trio { grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
   .lv3-stat-card { padding: 44px 24px; }
-  .lv3-footer-grid { grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; }
-  .lv3-footer-grid > :nth-child(4) { grid-column: span 3; padding-top: 32px; border-top: 1px solid var(--lv3-border); }
+  /* Brand on row 1 full-width, three link columns share row 2 evenly. */
+  .lv3-footer-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px 40px;
+  }
+  .lv3-footer-grid > :first-child {
+    grid-column: 1 / -1;
+  }
   .lv3-killer, .lv3-ledger, .lv3-import, .lv3-compare, .lv3-deploy, .lv3-stack, .lv3-cta { padding: 96px 0; }
   .lv3-problem { padding: 112px 0; }
   .lv3-ledger-head,
@@ -1539,9 +1550,18 @@
   .lv3-cta-row { flex-direction: column; align-items: stretch; }
   .lv3-cta-row .lv3-btn-primary, .lv3-cta-row .lv3-btn-ghost { justify-content: center; }
 
-  .lv3-footer-grid { grid-template-columns: 1fr 1fr; gap: 32px 24px; }
-  .lv3-footer-grid > :first-child { grid-column: span 2; }
-  .lv3-footer-bottom { flex-direction: column; gap: 8px; align-items: flex-start; font-size: 9px; }
+  /* Phones: brand full-width, link columns go to 2-up. */
+  .lv3-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 24px;
+  }
+  .lv3-footer-grid > :first-child { grid-column: 1 / -1; }
+  .lv3-footer-bottom {
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    font-size: 10px;
+  }
 
   .lv3-killer, .lv3-ledger, .lv3-import, .lv3-compare, .lv3-deploy, .lv3-stack { padding: 72px 0; }
   .lv3-problem { padding: 96px 0; }
